@@ -1,0 +1,8 @@
+[build]
+target = "wasm32-unknown-unknown"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+strip = "debuginfo"
+panic = "abort"
