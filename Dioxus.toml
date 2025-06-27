@@ -3,7 +3,7 @@
 [web.app]
 
 # HTML title tag content
-title = "dioxus"
+title = "Kratos"
 
 # include `assets` in web platform
 [web.resource]

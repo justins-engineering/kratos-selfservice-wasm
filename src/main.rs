@@ -1,26 +1,18 @@
-use dioxus::logger::tracing::{info, Level};
+use crate::views::{login::Login, register::Register};
+use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
 
-mod kratos;
+mod views;
 
-pub use crate::kratos::status_check;
 use ory_kratos_client::apis::configuration::Configuration;
+use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
 const KRATOS_PUBLIC_URL: &str = "http://kratos:4433/";
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433/";
 const COOKIE_SECRET: &str = "changeme";
 const CSRF_COOKIE_NAME: &str = "ory_csrf_ui";
 const CSRF_COOKIE_SECRET: &str = "changeme";
-
-// const ORY_CONFIG: Configuration = Configuration {
-//   base_path: "http://localhost:8080".to_owned(),
-//   user_agent: Some("OpenAPI-Generator/v1.3.8/rust".to_owned()),
-//   client: reqwest::Client::new(),
-//   basic_auth: None,
-//   oauth_access_token: None,
-//   bearer_access_token: None,
-//   api_key: None,
-// };
+const USER_AGENT: &str = "OpenAPI-Generator/v1.3.8/rust";
 
 trait Create {
   fn create() -> Configuration;
@@ -29,8 +21,8 @@ trait Create {
 impl Create for Configuration {
   fn create() -> Configuration {
     Configuration {
-      base_path: "http://localhost:8080".to_owned(),
-      user_agent: Some("OpenAPI-Generator/v1.3.8/rust".to_owned()),
+      base_path: KRATOS_BROWSER_URL.to_owned(),
+      user_agent: Some(USER_AGENT.to_owned()),
       client: reqwest::Client::new(),
       basic_auth: None,
       oauth_access_token: None,
@@ -44,23 +36,46 @@ impl Create for Configuration {
 #[rustfmt::skip]
 enum Route {
     #[layout(Navbar)]
-    #[route("/")]
-    Home {},
-    #[route("/blog/:id")]
-    Blog { id: i32 },
+      #[route("/")]
+      Home {},
+      #[route("/login?:flow")]
+      Login { flow: String },
+      #[route("/registration?:flow")]
+      Register { flow: String },
+    #[end_layout]
+    // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
+    #[route("/:..route")]
+    PageNotFound { route: Vec<String> },
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
-  dioxus::logger::init(Level::INFO).expect("logger failed to init");
+  dioxus::logger::initialize_default();
   dioxus::launch(App);
 }
 
 #[component]
 fn App() -> Element {
-  info!("App rendered");
+  spawn(async move {
+    match is_alive(&Configuration::create()).await {
+      Ok(r) => debug!("Kratos liveliness check: {}", r.status),
+      Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
+    };
+
+    match is_ready(&Configuration::create()).await {
+      Ok(r) => debug!("Kratos readiness check: {}", r.status),
+      Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
+    };
+  });
+
+  // spawn(async move {
+  //   let login = get_login_flow();
+  // });
+
+  // router.get('/login', async function (req, res) { const flow = await client.getLoginFlow(req.header('cookie'), req.query['flow']) res.render('login', flow) })
+
   rsx! {
     document::Link { rel: "icon", href: FAVICON }
     document::Link { rel: "stylesheet", href: TAILWIND_CSS }
@@ -68,23 +83,27 @@ fn App() -> Element {
   }
 }
 
+#[component]
+fn PageNotFound(route: Vec<String>) -> Element {
+  rsx! {
+      div { class: "text-center max-h-screen max-w-none",
+        h1 { class: "text-9xl my-12", "404" }
+        h2 { class: "text-2xl my-8", "Oops! Page not found." }
+        h3 { class: "font-light my-8",
+          "The page {route:?} might have been removed or is temporarily unavailable."
+        }
+        a {
+          class: "btn btn-primary my-8",
+          href: "/",
+          "Go Home"
+        }
+      }
+    }
+}
+
 /// Home page
 #[component]
 fn Home() -> Element {
-  let config = Configuration {
-    base_path: KRATOS_BROWSER_URL.to_string(),
-    user_agent: Some("OpenAPI-Generator/v1.3.8/rust".to_owned()),
-    client: reqwest::Client::new(),
-    basic_auth: None,
-    oauth_access_token: None,
-    bearer_access_token: None,
-    api_key: None,
-  };
-  let version = use_resource(move || {
-    let value = config.clone();
-    async move { status_check(&value.clone()).await }
-  });
-
   rsx! {
     article { class: "prose max-w-none",
       h1 { "Welcome to the Ory Account Experience!" }
@@ -92,7 +111,6 @@ fn Home() -> Element {
         "Let your customers sign up, log in and manage their account using Ory's standard experience. Here you can preview, test and learn to integrate it into your application."
       }
       p { "Your Ory Account Experience is running at 127.0.0.1:4455." }
-      code { "Kratos SDK Version: {version:?}" }
       hr {}
       h2 { "Core concepts" }
       p { "Here are some useful documentation pieces that help you get started right away." }
@@ -103,21 +121,21 @@ fn Home() -> Element {
 
 /// Blog page
 #[component]
-pub fn Blog(id: i32) -> Element {
+pub fn Blog(cookie: String) -> Element {
   rsx! {
-    div { id: "blog",
+  //   div { id: "blog",
 
-      // Content
-      h1 { "This is blog #{id}!" }
-      p {
-        "In blog #{id}, we show how the Dioxus router works and how URL parameters can be passed as props to our route components."
-      }
+  //     // Content
+  //     h1 { "This is blog #{id}!" }
+  //     p {
+  //       "In blog #{id}, we show how the Dioxus router works and how URL parameters can be passed as props to our route components."
+  //     }
 
-      // Navigation links
-      Link { to: Route::Blog { id: id - 1 }, "Previous" }
-      span { " <---> " }
-      Link { to: Route::Blog { id: id + 1 }, "Next" }
-    }
+  //     // Navigation links
+  //     Link { to: Route::Blog { id: id - 1 }, "Previous" }
+  //     span { " <---> " }
+  //     Link { to: Route::Blog { id: id + 1 }, "Next" }
+  //   }
   }
 }
 
@@ -153,33 +171,30 @@ fn Navbar() -> Element {
             Link { to: Route::Home {}, "Home" }
           }
           li {
-            Link { to: Route::Blog { id: 1 }, "Blog" }
-          }
-          li {
             a { href: "http://127.0.0.1:4455/welcome", "Overview" }
           }
           li {
             a { href: "http://127.0.0.1:4455/sessions", "Session Information" }
           }
           li {
-            h2 { class: "menu-title text-neutral", "Default User Interfaces" }
+            h2 { class: "menu-title", "Default User Interfaces" }
             ul {
               li {
-                a { href: "http://127.0.0.1:4455/login", "Sign In" }
+                a { href: "http://127.0.0.1:4433/self-service/login/browser", "Sign In" }
               }
               li {
-                a { href: "http://127.0.0.1:4455/registration", "Sign Up" }
+                a { href: "http://127.0.0.1:4433/self-service/registration/browser", "Sign Up" }
               }
               li {
-                a { href: "http://127.0.0.1:4455/recovery", "Account Recovery" }
+                a { href: "http://127.0.0.1:4433/self-service/recovery", "Account Recovery" }
               }
               li {
-                a { href: "http://127.0.0.1:4455/verification",
+                a { href: "http://127.0.0.1:4433/self-service/verification",
                   "Account Verification"
                 }
               }
               li {
-                a { href: "http://127.0.0.1:4455/settings", "Account Settings" }
+                a { href: "http://127.0.0.1:4433/self-service/settings", "Account Settings" }
               }
               li {
                 a { href: "http://127.0.0.1:4433/self-service/logout?token=",

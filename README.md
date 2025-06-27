@@ -19,12 +19,20 @@ project/
 bunx @tailwindcss/cli -i ./tailwind.css -o ./assets/tailwind.css --watch
 ```
 
+### Starting Kratos
+
+Run the following command in the root of your project:
+
+```bash
+docker-compose up --force-recreate
+```
+
 ### Serving Your App
 
 Run the following command in the root of your project to start developing with the default platform:
 
 ```bash
-dx serve
+dx serve --addr 127.0.0.1 --port 4455
 ```
 
 To run for a different platform, use the `--platform platform` flag. E.g.
