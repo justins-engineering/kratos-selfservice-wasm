@@ -1,5 +1,15 @@
 use dioxus::prelude::*;
 
+// const {
+//       flow,
+//       aal = "",
+//       refresh = "",
+//       return_to = "",
+//       organization = "",
+//       via = "",
+//       login_challenge,
+//     } = req.query
+
 #[component]
 pub fn Register(flow: String) -> Element {
   rsx! {

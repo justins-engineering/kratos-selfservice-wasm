@@ -1,3 +1,4 @@
+use crate::KRATOS_BROWSER_URL;
 use dioxus::prelude::*;
 
 #[component]
@@ -7,14 +8,15 @@ pub fn Login(flow: String) -> Element {
       div { class: "mt-10",
         form {
           "accept-charset": "UTF-8",
-          action: "/users/sign_in",
+          action: "{KRATOS_BROWSER_URL}/self-service/login?flow={flow}",
           class: "",
           method: "post",
           input {
             autocomplete: "off",
-            name: "authenticity_token",
+            name: "csrf_token",
             r#type: "hidden",
             value: "{flow}",
+            // "68RsMTGRKXjtOFgQSgJdlqSak3Kf3y/HG37qG0XS26TDBB7mH4ILC/Yewuu7MV4q7gspVIN3JA4ds0ed65XIng=="
           }
           div { class: "mt-2",
             fieldset { class: "fieldset",

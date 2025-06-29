@@ -16,17 +16,21 @@ services:
     restart: on-failure
     networks:
       - intranet
-  # kratos-selfservice-ui-node:
-  #   image: oryd/kratos-selfservice-ui-node:v1.3.1
-  #   environment:
-  #     - KRATOS_PUBLIC_URL=http://kratos:4433/
-  #     - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
-  #     - COOKIE_SECRET=changeme
-  #     - CSRF_COOKIE_NAME=ory_csrf_ui
-  #     - CSRF_COOKIE_SECRET=changeme
-  #   networks:
-  #     - intranet
-  #   restart: on-failure
+  kratos-selfservice-ui-node:
+    image: oryd/kratos-selfservice-ui-node:v1.3.1
+    environment:
+      - PORT=4455
+      - SECURITY_MODE=
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+      - COOKIE_SECRET=changeme
+      - CSRF_COOKIE_NAME=ory_csrf_ui
+      - CSRF_COOKIE_SECRET=changeme
+    networks:
+      - intranet
+    ports:
+      - "4455:4455"
+    restart: on-failure
   kratos:
     depends_on:
       - kratos-migrate

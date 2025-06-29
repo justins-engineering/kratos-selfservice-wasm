@@ -2,7 +2,10 @@
 target = "wasm32-unknown-unknown"
 
 [profile.release]
+opt-level = "z"
+debug = false
+lto = true
 codegen-units = 1
-lto = "fat"
-strip = "debuginfo"
 panic = "abort"
+strip = true
+incremental = false

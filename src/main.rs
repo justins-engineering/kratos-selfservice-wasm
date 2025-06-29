@@ -7,11 +7,11 @@ mod views;
 use ory_kratos_client::apis::configuration::Configuration;
 use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
-const KRATOS_PUBLIC_URL: &str = "http://kratos:4433/";
-const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433/";
-const COOKIE_SECRET: &str = "changeme";
-const CSRF_COOKIE_NAME: &str = "ory_csrf_ui";
-const CSRF_COOKIE_SECRET: &str = "changeme";
+// const KRATOS_PUBLIC_URL: &str = "http://kratos:4433";
+const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
+// const COOKIE_SECRET: &str = "changeme";
+// const CSRF_COOKIE_NAME: &str = "ory_csrf_ui";
+// const CSRF_COOKIE_SECRET: &str = "changeme";
 const USER_AGENT: &str = "OpenAPI-Generator/v1.3.8/rust";
 
 trait Create {
@@ -86,19 +86,19 @@ fn App() -> Element {
 #[component]
 fn PageNotFound(route: Vec<String>) -> Element {
   rsx! {
-      div { class: "text-center max-h-screen max-w-none",
-        h1 { class: "text-9xl my-12", "404" }
-        h2 { class: "text-2xl my-8", "Oops! Page not found." }
-        h3 { class: "font-light my-8",
-          "The page {route:?} might have been removed or is temporarily unavailable."
-        }
-        a {
-          class: "btn btn-primary my-8",
-          href: "/",
-          "Go Home"
-        }
+    div { class: "text-center max-h-screen max-w-none",
+      h1 { class: "text-9xl my-12", "404" }
+      h2 { class: "text-2xl my-8", "Oops! Page not found." }
+      h3 { class: "font-light my-8",
+        "The page {route:?} might have been removed or is temporarily unavailable."
+      }
+      a {
+        class: "btn btn-primary my-8",
+        href: "/",
+        "Go Home"
       }
     }
+  }
 }
 
 /// Home page
@@ -116,26 +116,6 @@ fn Home() -> Element {
       p { "Here are some useful documentation pieces that help you get started right away." }
     }
     Cards {}
-  }
-}
-
-/// Blog page
-#[component]
-pub fn Blog(cookie: String) -> Element {
-  rsx! {
-  //   div { id: "blog",
-
-  //     // Content
-  //     h1 { "This is blog #{id}!" }
-  //     p {
-  //       "In blog #{id}, we show how the Dioxus router works and how URL parameters can be passed as props to our route components."
-  //     }
-
-  //     // Navigation links
-  //     Link { to: Route::Blog { id: id - 1 }, "Previous" }
-  //     span { " <---> " }
-  //     Link { to: Route::Blog { id: id + 1 }, "Next" }
-  //   }
   }
 }
 
