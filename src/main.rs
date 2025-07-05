@@ -1,7 +1,8 @@
-use crate::views::{login::Login, register::Register};
+use crate::views::{error::PageNotFound, error::ServerError, login::Login, register::Register};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
 
+mod components;
 mod views;
 
 use ory_kratos_client::apis::configuration::Configuration;
@@ -12,7 +13,7 @@ const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
 // const COOKIE_SECRET: &str = "changeme";
 // const CSRF_COOKIE_NAME: &str = "ory_csrf_ui";
 // const CSRF_COOKIE_SECRET: &str = "changeme";
-const USER_AGENT: &str = "OpenAPI-Generator/v1.3.8/rust";
+// const USER_AGENT: &str = "OpenAPI-Generator/v1.3.8/rust";
 
 trait Create {
   fn create() -> Configuration;
@@ -20,10 +21,22 @@ trait Create {
 
 impl Create for Configuration {
   fn create() -> Configuration {
+    let mut headers = reqwest::header::HeaderMap::with_capacity(1);
+    headers.insert(
+      reqwest::header::ACCEPT,
+      reqwest::header::HeaderValue::from_static("application/json"),
+    );
+    headers.insert(
+      reqwest::header::CONTENT_TYPE,
+      reqwest::header::HeaderValue::from_static("application/json"),
+    );
     Configuration {
       base_path: KRATOS_BROWSER_URL.to_owned(),
-      user_agent: Some(USER_AGENT.to_owned()),
-      client: reqwest::Client::new(),
+      user_agent: None, //Some(USER_AGENT.to_owned()),
+      client: reqwest::ClientBuilder::new()
+        .default_headers(headers)
+        .build()
+        .expect("Failed to build reqwest client"),
       basic_auth: None,
       oauth_access_token: None,
       bearer_access_token: None,
@@ -44,6 +57,8 @@ enum Route {
       Register { flow: String },
     #[end_layout]
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
+    #[route("/error?:id")]
+    ServerError { id: String },
     #[route("/:..route")]
     PageNotFound { route: Vec<String> },
 }
@@ -70,34 +85,10 @@ fn App() -> Element {
     };
   });
 
-  // spawn(async move {
-  //   let login = get_login_flow();
-  // });
-
-  // router.get('/login', async function (req, res) { const flow = await client.getLoginFlow(req.header('cookie'), req.query['flow']) res.render('login', flow) })
-
   rsx! {
     document::Link { rel: "icon", href: FAVICON }
     document::Link { rel: "stylesheet", href: TAILWIND_CSS }
     Router::<Route> {}
-  }
-}
-
-#[component]
-fn PageNotFound(route: Vec<String>) -> Element {
-  rsx! {
-    div { class: "text-center max-h-screen max-w-none",
-      h1 { class: "text-9xl my-12", "404" }
-      h2 { class: "text-2xl my-8", "Oops! Page not found." }
-      h3 { class: "font-light my-8",
-        "The page {route:?} might have been removed or is temporarily unavailable."
-      }
-      a {
-        class: "btn btn-primary my-8",
-        href: "/",
-        "Go Home"
-      }
-    }
   }
 }
 
@@ -160,13 +151,22 @@ fn Navbar() -> Element {
             h2 { class: "menu-title", "Default User Interfaces" }
             ul {
               li {
-                a { href: "http://127.0.0.1:4433/self-service/login/browser", "Sign In" }
+                a { href: "http://127.0.0.1:4433/self-service/login/browser",
+                  "Sign In"
+                }
               }
               li {
-                a { href: "http://127.0.0.1:4433/self-service/registration/browser", "Sign Up" }
+                Link {
+                  to: Route::Register {
+                      flow: "".to_string(),
+                  },
+                  "Sign Up"
+                }
               }
               li {
-                a { href: "http://127.0.0.1:4433/self-service/recovery", "Account Recovery" }
+                a { href: "http://127.0.0.1:4433/self-service/recovery",
+                  "Account Recovery"
+                }
               }
               li {
                 a { href: "http://127.0.0.1:4433/self-service/verification",
@@ -174,7 +174,9 @@ fn Navbar() -> Element {
                 }
               }
               li {
-                a { href: "http://127.0.0.1:4433/self-service/settings", "Account Settings" }
+                a { href: "http://127.0.0.1:4433/self-service/settings",
+                  "Account Settings"
+                }
               }
               li {
                 a { href: "http://127.0.0.1:4433/self-service/logout?token=",
