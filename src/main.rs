@@ -8,12 +8,7 @@ mod views;
 use ory_kratos_client::apis::configuration::Configuration;
 use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
-// const KRATOS_PUBLIC_URL: &str = "http://kratos:4433";
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
-// const COOKIE_SECRET: &str = "changeme";
-// const CSRF_COOKIE_NAME: &str = "ory_csrf_ui";
-// const CSRF_COOKIE_SECRET: &str = "changeme";
-// const USER_AGENT: &str = "OpenAPI-Generator/v1.3.8/rust";
 
 trait Create {
   fn create() -> Configuration;
@@ -73,17 +68,17 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-  spawn(async move {
-    match is_alive(&Configuration::create()).await {
-      Ok(r) => debug!("Kratos liveliness check: {}", r.status),
-      Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
-    };
+  // spawn(async move {
+  //   match is_alive(&Configuration::create()).await {
+  //     Ok(r) => debug!("Kratos liveliness check: {}", r.status),
+  //     Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
+  //   };
 
-    match is_ready(&Configuration::create()).await {
-      Ok(r) => debug!("Kratos readiness check: {}", r.status),
-      Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
-    };
-  });
+  //   match is_ready(&Configuration::create()).await {
+  //     Ok(r) => debug!("Kratos readiness check: {}", r.status),
+  //     Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
+  //   };
+  // });
 
   rsx! {
     document::Link { rel: "icon", href: FAVICON }

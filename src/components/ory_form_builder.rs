@@ -1,3 +1,5 @@
+use std::format;
+
 use dioxus::prelude::*;
 use ory_kratos_client::models::registration_flow::RegistrationFlow;
 use ory_kratos_client::models::UiNodeAttributes::*;
@@ -51,10 +53,8 @@ fn InputButton(
   attrs: Box<ory_kratos_client::models::UiNodeInputAttributes>,
 ) -> Element {
   rsx! {
-    input {
-      required: if let Some(r) = attrs.required { r },
+    button {
       disabled: attrs.disabled,
-      autocomplete: if let Some(a) = attrs.autocomplete { format!("{:?}", a).to_lowercase() },
       autofocus: "autofocus",
       class: "btn btn-primary w-full my-4",
       id: if let Some(ref label) = meta { format!("{}", label.id) },
@@ -69,6 +69,10 @@ fn InputButton(
       } else {
           "".to_string()
       } },
+
+      if let Some(ref label) = meta {
+        {label.text.to_string()}
+      }
     }
   }
 }
