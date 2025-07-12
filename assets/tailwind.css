@@ -1522,9 +1522,6 @@
   .relative {
     position: relative;
   }
-  .static {
-    position: static;
-  }
   .textarea {
     border: var(--border) solid #0000;
     min-height: calc(0.25rem * 20);
@@ -2368,15 +2365,6 @@
   .w-full {
     width: 100%;
   }
-  .max-w-4 {
-    max-width: calc(var(--spacing) * 4);
-  }
-  .max-w-4\/5 {
-    max-width: calc(4/5 * 100%);
-  }
-  .max-w-full {
-    max-width: 100%;
-  }
   .max-w-none {
     max-width: none;
   }
@@ -2439,9 +2427,6 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
-  .items-center {
-    align-items: center;
-  }
   .menu-lg {
     :where(li:not(.menu-title) > *:not(ul, details, .menu-title)), :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
       border-radius: var(--radius-field);
@@ -2485,9 +2470,6 @@
   }
   .text-center {
     text-align: center;
-  }
-  .text-left {
-    text-align: left;
   }
   .text-2xl {
     font-size: var(--text-2xl);
@@ -2537,25 +2519,6 @@
   }
   .uppercase {
     text-transform: uppercase;
-  }
-  .btn-link {
-    text-decoration-line: underline;
-    outline-color: currentColor;
-    --btn-border: #0000;
-    --btn-bg: #0000;
-    --btn-fg: var(--color-primary);
-    --btn-noise: none;
-    --btn-shadow: "";
-    &:is(.btn-active, :hover, :active:focus, :focus-visible) {
-      text-decoration-line: underline;
-      --btn-border: #0000;
-      --btn-bg: #0000;
-    }
-    @media (hover: none) {
-      &:hover:not(.btn-active, :active, :focus-visible, :disabled, [disabled], .btn-disabled) {
-        text-decoration-line: none;
-      }
-    }
   }
   .link-hover {
     text-decoration-line: none;
@@ -2648,11 +2611,6 @@
   .lg\:h-full {
     @media (width >= 64rem) {
       height: 100%;
-    }
-  }
-  .lg\:max-w-4\/5 {
-    @media (width >= 64rem) {
-      max-width: calc(4/5 * 100%);
     }
   }
   .lg\:basis-1\/6 {

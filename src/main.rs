@@ -1,12 +1,13 @@
-use crate::views::{error::PageNotFound, error::ServerError, login::Login, register::Register};
-use dioxus::logger::tracing::{debug, error};
-use dioxus::prelude::*;
-
 mod components;
-mod views;
-
+use dioxus::prelude::*;
 use ory_kratos_client::apis::configuration::Configuration;
-use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
+mod views;
+use crate::views::{
+  LoginFlow, PageNotFound, RegisterFlow, ServerError, SignIn, SignUp, VerificationFlow, Verify,
+};
+
+// use dioxus::logger::tracing::{debug, error};
+// use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
 
@@ -16,22 +17,9 @@ trait Create {
 
 impl Create for Configuration {
   fn create() -> Configuration {
-    let mut headers = reqwest::header::HeaderMap::with_capacity(1);
-    headers.insert(
-      reqwest::header::ACCEPT,
-      reqwest::header::HeaderValue::from_static("application/json"),
-    );
-    headers.insert(
-      reqwest::header::CONTENT_TYPE,
-      reqwest::header::HeaderValue::from_static("application/json"),
-    );
     Configuration {
       base_path: KRATOS_BROWSER_URL.to_owned(),
       user_agent: None, //Some(USER_AGENT.to_owned()),
-      client: reqwest::ClientBuilder::new()
-        .default_headers(headers)
-        .build()
-        .expect("Failed to build reqwest client"),
       basic_auth: None,
       oauth_access_token: None,
       bearer_access_token: None,
@@ -46,10 +34,18 @@ enum Route {
     #[layout(Navbar)]
       #[route("/")]
       Home {},
+      #[route("/sign-in")]
+      SignIn {},
       #[route("/login?:flow")]
-      Login { flow: String },
+      LoginFlow { flow: String },
+      #[route("/sign-up")]
+      SignUp {},
       #[route("/registration?:flow")]
-      Register { flow: String },
+      RegisterFlow { flow: String },
+      #[route("/verify")]
+      Verify {},
+      #[route("/verification?:flow")]
+      VerificationFlow { flow: String },
     #[end_layout]
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
@@ -96,7 +92,6 @@ fn Home() -> Element {
       p {
         "Let your customers sign up, log in and manage their account using Ory's standard experience. Here you can preview, test and learn to integrate it into your application."
       }
-      p { "Your Ory Account Experience is running at 127.0.0.1:4455." }
       hr {}
       h2 { "Core concepts" }
       p { "Here are some useful documentation pieces that help you get started right away." }
@@ -146,17 +141,10 @@ fn Navbar() -> Element {
             h2 { class: "menu-title", "Default User Interfaces" }
             ul {
               li {
-                a { href: "http://127.0.0.1:4433/self-service/login/browser",
-                  "Sign In"
-                }
+                Link { to: Route::SignIn {}, "Sign In" }
               }
               li {
-                Link {
-                  to: Route::Register {
-                      flow: "".to_string(),
-                  },
-                  "Sign Up"
-                }
+                Link { to: Route::SignUp {}, "Sign Up" }
               }
               li {
                 a { href: "http://127.0.0.1:4433/self-service/recovery",
@@ -164,9 +152,7 @@ fn Navbar() -> Element {
                 }
               }
               li {
-                a { href: "http://127.0.0.1:4433/self-service/verification",
-                  "Account Verification"
-                }
+                Link { to: Route::Verify {}, "Account Verification" }
               }
               li {
                 a { href: "http://127.0.0.1:4433/self-service/settings",
