@@ -1,4 +1,4 @@
-use crate::{Configuration, Create};
+use crate::{Configuration, Create, Route};
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::get_flow_error;
 
@@ -11,7 +11,7 @@ pub fn PageNotFound(route: Vec<String>) -> Element {
       h3 { class: "font-light my-8",
         "The page {route:?} might have been removed or is temporarily unavailable."
       }
-      a { class: "btn btn-primary my-8", href: "/", "Go Home" }
+      Link { to: Route::Home {}, class: "btn btn-primary my-8", "Go Home" }
     }
   }
 }
@@ -55,7 +55,7 @@ pub fn ServerError(id: String) -> Element {
             p { class: "font-light my-8", "Fetching error..." }
           },
       }
-      a { class: "btn btn-primary my-8", href: "/", "Go Home" }
+      Link { to: Route::Home {}, class: "btn btn-primary my-8", "Go Home" }
     }
   }
 }

@@ -17,18 +17,10 @@ pub fn Verify() -> Element {
       Ok(res) => {
         debug!("{:#?}", res);
         rsx! {
-          div { class: "mx-auto w-full max-w-sm",
+          h1 { class: "text-center text-2xl", "Account Verification" }
+          div { class: "mx-auto w-full max-w-lg",
             div { class: "mt-10",
-              form {
-                action: "{&res.ui.action}",
-                method: "{&res.ui.method}",
-                div { class: "mt-2",
-                  fieldset { class: "fieldset",
-                    legend { class: "fieldset-legend text-2xl", "Verify your account" }
-                    FormBuilder { nodes: res.ui.nodes.to_owned() }
-                  }
-                }
-              }
+              FormBuilder { ui: *res.ui.to_owned() }
               p { class: "text-sm leading-6",
                 "Already have an account? "
                 Link {
@@ -43,7 +35,7 @@ pub fn Verify() -> Element {
       }
       Err(err) => {
         rsx! {
-          h1 { "Failed to create VerificationFlow! Error: {err:?}" }
+          p { "Failed to create VerificationFlow! Error: {err:?}" }
         }
       }
     },
@@ -64,21 +56,10 @@ pub fn VerificationFlow(flow: String) -> Element {
       Ok(res) => {
         debug!("{:#?}", res);
         rsx! {
-          div { class: "mx-auto w-full max-w-sm",
+          h1 { class: "text-center text-2xl", "Account Verification" }
+          div { class: "mx-auto w-full max-w-lg",
             div { class: "mt-10",
-              form {
-                action: "{&res.ui.action}",
-                method: "{&res.ui.method}",
-                div { class: "mt-2",
-                  fieldset { class: "fieldset",
-                    legend { class: "fieldset-legend text-2xl", "Verify your account" }
-                    p {
-                      "An email containing a verification code has been sent to the email address you provided. If you have not received an email, check the spelling of the address and make sure to use the address you registered with."
-                    }
-                    FormBuilder { nodes: res.ui.nodes.to_owned() }
-                  }
-                }
-              }
+              FormBuilder { ui: *res.ui.to_owned() }
               p { class: "text-sm leading-6",
                 "Already have an account? "
                 Link {
@@ -94,7 +75,7 @@ pub fn VerificationFlow(flow: String) -> Element {
       Err(err) => {
         navigator().replace(Route::Verify {});
         rsx! {
-          h1 { "Failed to get VerificationFlow! Error: {err:?}" }
+          p { "Failed to get VerificationFlow! Error: {err:?}" }
         }
       }
     },

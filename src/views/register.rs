@@ -1,4 +1,5 @@
-use crate::components::FormBuilder;
+use crate::components::{DisplayError, FormBuilder};
+// use crate::components::{FormBuilder, OryError};
 use crate::{Configuration, Create, Route};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
@@ -17,18 +18,10 @@ pub fn SignUp() -> Element {
       Ok(res) => {
         debug!("{:#?}", res);
         rsx! {
-          div { class: "mx-auto w-full max-w-sm",
+          h1 { class: "text-center text-2xl", "Sign Up" }
+          div { class: "mx-auto w-full max-w-lg",
             div { class: "mt-10",
-              form {
-                action: "{&res.ui.action}",
-                method: "{&res.ui.method}",
-                div { class: "mt-2",
-                  fieldset { class: "fieldset",
-                    legend { class: "fieldset-legend text-2xl", "Sign Up" }
-                    FormBuilder { nodes: res.ui.nodes.to_owned() }
-                  }
-                }
-              }
+              FormBuilder { ui: *res.ui.to_owned() }
               p { class: "text-sm leading-6",
                 "Already have an account? "
                 Link {
@@ -41,9 +34,15 @@ pub fn SignUp() -> Element {
           }
         }
       }
+      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+        {res.clone().view_response_content()}
+      },
+
       Err(err) => {
+        error!("{err:#?}");
         rsx! {
-          h1 { "Failed to create RegistrationFlow! Error: {err:?}" }
+          p { "Failed to get RegistrationFlow! Error:" }
+          p { "{err:#?}" }
         }
       }
     },
@@ -64,19 +63,10 @@ pub fn RegisterFlow(flow: String) -> Element {
       Ok(res) => {
         debug!("{:#?}", res);
         rsx! {
-          div { class: "mx-auto w-full max-w-sm",
+          h1 { class: "text-center text-2xl", "Sign Up" }
+          div { class: "mx-auto w-full max-w-lg",
             div { class: "mt-10",
-              form {
-                action: "{&res.ui.action}",
-                method: "{&res.ui.method}",
-                div { class: "mt-2",
-                  fieldset { class: "fieldset",
-                    legend { class: "fieldset-legend text-2xl", "Sign Up" }
-                    p { "Please choose a credential to authenticate yourself with." }
-                    FormBuilder { nodes: res.ui.nodes.to_owned() }
-                  }
-                }
-              }
+              FormBuilder { ui: *res.ui.to_owned() }
               p { class: "text-sm leading-6",
                 "Already have an account? "
                 Link {
@@ -91,8 +81,9 @@ pub fn RegisterFlow(flow: String) -> Element {
       }
       Err(err) => {
         navigator().replace(Route::SignUp {});
+        error!("{err:#?}");
         rsx! {
-          h1 { "Failed to get RegistrationFlow! Error: {err:?}" }
+          p { "Failed to get RegistrationFlow! Error:\n {err:#?}" }
         }
       }
     },

@@ -3,7 +3,8 @@ use dioxus::prelude::*;
 use ory_kratos_client::apis::configuration::Configuration;
 mod views;
 use crate::views::{
-  LoginFlow, PageNotFound, RegisterFlow, ServerError, SignIn, SignUp, VerificationFlow, Verify,
+  AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, Settings,
+  SettingsFlow, SignIn, SignUp, VerificationFlow, Verify,
 };
 
 // use dioxus::logger::tracing::{debug, error};
@@ -28,6 +29,8 @@ impl Create for Configuration {
   }
 }
 
+static SESSION: GlobalSignal<bool> = Global::new(|| false);
+
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
 enum Route {
@@ -46,6 +49,14 @@ enum Route {
       Verify {},
       #[route("/verification?:flow")]
       VerificationFlow { flow: String },
+      #[route("/my-settings")]
+      Settings {},
+      #[route("/settings?:flow")]
+      SettingsFlow { flow: String },
+      #[route("/account-recovery")]
+      AccountRecovery {},
+      #[route("/recovery?:flow")]
+      RecoveryFlow { flow: String },
     #[end_layout]
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
@@ -132,36 +143,35 @@ fn Navbar() -> Element {
             Link { to: Route::Home {}, "Home" }
           }
           li {
-            a { href: "http://127.0.0.1:4455/welcome", "Overview" }
-          }
-          li {
             a { href: "http://127.0.0.1:4455/sessions", "Session Information" }
           }
           li {
             h2 { class: "menu-title", "Default User Interfaces" }
             ul {
-              li {
-                Link { to: Route::SignIn {}, "Sign In" }
-              }
-              li {
-                Link { to: Route::SignUp {}, "Sign Up" }
-              }
-              li {
-                a { href: "http://127.0.0.1:4433/self-service/recovery",
-                  "Account Recovery"
+              if !SESSION() {
+                li {
+                  Link { to: Route::SignIn {}, "Sign In" }
                 }
-              }
-              li {
-                Link { to: Route::Verify {}, "Account Verification" }
-              }
-              li {
-                a { href: "http://127.0.0.1:4433/self-service/settings",
-                  "Account Settings"
+                li {
+                  Link { to: Route::SignUp {}, "Sign Up" }
                 }
-              }
-              li {
-                a { href: "http://127.0.0.1:4433/self-service/logout?token=",
-                  "Log out"
+                li {
+                  Link { to: Route::AccountRecovery {}, "Account Recovery" }
+                }
+                li {
+                  Link { to: Route::Verify {}, "Account Verification" }
+                }
+              } else {
+                li {
+                  Link { to: Route::Verify {}, "Account Verification" }
+                }
+                li {
+                  Link { to: Route::Settings {}, "Account Settings" }
+                }
+                li {
+                  a { href: "http://127.0.0.1:4433/self-service/logout?token=",
+                    "Log out"
+                  }
                 }
               }
             }
