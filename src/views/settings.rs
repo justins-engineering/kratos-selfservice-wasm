@@ -1,6 +1,6 @@
 use crate::components::FormBuilder;
 use crate::{Configuration, Create, Route};
-use dioxus::logger::tracing::{debug, error};
+use dioxus::logger::tracing::debug;
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::{create_browser_settings_flow, get_settings_flow};
 
@@ -13,7 +13,7 @@ pub fn Settings() -> Element {
   return match &*create_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "User Settings" }
           div { class: "mx-auto w-full max-w-lg",
@@ -42,7 +42,7 @@ pub fn SettingsFlow(flow: String) -> Element {
   return match &*get_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "User Settings" }
           div { class: "mx-auto w-full max-w-lg",

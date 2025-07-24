@@ -1,16 +1,27 @@
 mod components;
-use dioxus::prelude::*;
+use crate::components::OryLogOut;
+use dioxus::{logger::tracing::debug, prelude::*};
 use ory_kratos_client::apis::configuration::Configuration;
 mod views;
 use crate::views::{
-  AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, Settings,
-  SettingsFlow, SignIn, SignUp, VerificationFlow, Verify,
+  AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, SessionInfo,
+  Settings, SettingsFlow, SignIn, SignUp, VerificationFlow, Verify,
 };
+
+#[cfg(feature = "web")]
+use gloo_timers::callback::Timeout;
 
 // use dioxus::logger::tracing::{debug, error};
 // use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
+const KRATOS_LIFETIME_MINUTES: u32 = 60;
+const KRATOS_LIFETIME: u32 = KRATOS_LIFETIME_MINUTES * 60 * 1000;
+
+#[derive(Clone, Copy)]
+struct Session {
+  state: Signal<bool>,
+}
 
 trait Create {
   fn create() -> Configuration;
@@ -29,14 +40,14 @@ impl Create for Configuration {
   }
 }
 
-static SESSION: GlobalSignal<bool> = Global::new(|| false);
-
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
 enum Route {
     #[layout(Navbar)]
       #[route("/")]
       Home {},
+      #[route("/session")]
+      SessionInfo {},
       #[route("/sign-in")]
       SignIn {},
       #[route("/login?:flow")]
@@ -58,6 +69,8 @@ enum Route {
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
     #[end_layout]
+    #[route("/session")]
+      SessionState {},
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
     ServerError { id: String },
@@ -75,6 +88,10 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+  use_context_provider(|| Session {
+    state: Signal::new(false),
+  });
+
   // spawn(async move {
   //   match is_alive(&Configuration::create()).await {
   //     Ok(r) => debug!("Kratos liveliness check: {}", r.status),
@@ -111,9 +128,26 @@ fn Home() -> Element {
   }
 }
 
+#[component]
+fn SessionState() -> Element {
+  let mut state = use_context::<Session>().state;
+
+  debug!("Setting Session state to true");
+  *state.write() = true;
+  let timeout = Timeout::new(KRATOS_LIFETIME, move || {
+    debug!("Setting Session state to false");
+    *state.write() = false;
+  });
+  timeout.forget();
+
+  navigator().replace(Route::Home {});
+  rsx! {}
+}
+
 /// Shared navbar component.
 #[component]
 fn Navbar() -> Element {
+  let loged_in = use_context::<Session>().state;
   rsx! {
     div { class: "drawer lg:drawer-open",
       input {
@@ -143,12 +177,12 @@ fn Navbar() -> Element {
             Link { to: Route::Home {}, "Home" }
           }
           li {
-            a { href: "http://127.0.0.1:4455/sessions", "Session Information" }
+            Link { to: Route::SessionInfo {}, "Session Information" }
           }
           li {
             h2 { class: "menu-title", "Default User Interfaces" }
             ul {
-              if !SESSION() {
+              if !loged_in() {
                 li {
                   Link { to: Route::SignIn {}, "Sign In" }
                 }
@@ -161,18 +195,31 @@ fn Navbar() -> Element {
                 li {
                   Link { to: Route::Verify {}, "Account Verification" }
                 }
+                li { class: "menu-disabled",
+                  Link { to: Route::Settings {}, "Account Settings" }
+                }
+                li { class: "menu-disabled",
+                  a { href: "{KRATOS_BROWSER_URL}/self-service/logout",
+                    "Log out"
+                  }
+                }
               } else {
+                li { class: "menu-disabled",
+                  Link { to: Route::SignIn {}, "Sign In" }
+                }
+                li { class: "menu-disabled",
+                  Link { to: Route::SignUp {}, "Sign Up" }
+                }
+                li { class: "menu-disabled",
+                  Link { to: Route::AccountRecovery {}, "Account Recovery" }
+                }
                 li {
                   Link { to: Route::Verify {}, "Account Verification" }
                 }
                 li {
                   Link { to: Route::Settings {}, "Account Settings" }
                 }
-                li {
-                  a { href: "http://127.0.0.1:4433/self-service/logout?token=",
-                    "Log out"
-                  }
-                }
+                li { OryLogOut {} }
               }
             }
           }

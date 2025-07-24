@@ -15,7 +15,7 @@ pub fn Verify() -> Element {
   return match &*create_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "Account Verification" }
           div { class: "mx-auto w-full max-w-lg",
@@ -54,7 +54,7 @@ pub fn VerificationFlow(flow: String) -> Element {
   return match &*get_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "Account Verification" }
           div { class: "mx-auto w-full max-w-lg",

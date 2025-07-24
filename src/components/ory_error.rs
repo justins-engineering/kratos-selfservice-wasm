@@ -1,23 +1,11 @@
 use crate::Route;
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::{
-  CreateBrowserLoginFlowError, CreateBrowserRecoveryFlowError, CreateBrowserRegistrationFlowError,
+  CreateBrowserLoginFlowError, CreateBrowserLogoutFlowError, CreateBrowserRecoveryFlowError,
+  CreateBrowserRegistrationFlowError, ToSessionError,
 };
 use ory_kratos_client::apis::ResponseContent;
 use ory_kratos_client::models::error_generic::ErrorGeneric;
-
-// #[component]
-// pub fn OryError(err: ory_kratos_client::models::GenericError) -> Element {
-//   rsx! {
-//     div { class: "text-center max-h-screen max-w-none",
-//       h1 { class: "text-2xl my-8", {err.message} }
-//       p { class: "font-light m-8", {err.reason} }
-//       a { class: "btn btn-primary my-8", href: "/", "Go Home" }
-//     }
-//   }
-// }
-
-// impl<T: ErrorGeneric> ResponseContent<T> {}
 
 fn error_content_rsx(err: ErrorGeneric) -> Element {
   rsx! {
@@ -74,6 +62,60 @@ impl DisplayError for ResponseContent<CreateBrowserLoginFlowError> {
           }
         }
         CreateBrowserLoginFlowError::Status400(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+      }
+    } else {
+      rsx! {
+        p { {self.content.to_string()} }
+      }
+    }
+  }
+}
+
+impl DisplayError for ResponseContent<CreateBrowserLogoutFlowError> {
+  fn view_response_content(self) -> Element {
+    if let Some(ent) = self.entity {
+      match ent {
+        CreateBrowserLogoutFlowError::UnknownValue(value) => {
+          rsx! {
+            {error_content_js(value)}
+          }
+        }
+        CreateBrowserLogoutFlowError::Status400(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserLogoutFlowError::Status401(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserLogoutFlowError::Status500(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+      }
+    } else {
+      rsx! {
+        p { {self.content.to_string()} }
+      }
+    }
+  }
+}
+
+impl DisplayError for ResponseContent<ToSessionError> {
+  fn view_response_content(self) -> Element {
+    if let Some(ent) = self.entity {
+      match ent {
+        ToSessionError::DefaultResponse(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        ToSessionError::UnknownValue(value) => {
+          rsx! {
+            {error_content_js(value)}
+          }
+        }
+        ToSessionError::Status401(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        ToSessionError::Status403(error_generic) => rsx! {
           {error_content_rsx(error_generic)}
         },
       }

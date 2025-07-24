@@ -23,7 +23,7 @@ fn InputFieldNode(
       }
       input {
         required: if let Some(r) = attrs.required { r },
-        autocomplete: if let Some(a) = attrs.autocomplete { format!("{:?}", a).to_lowercase() },
+        autocomplete: if let Some(a) = attrs.autocomplete { format!("{a:?}").to_lowercase() },
         class: "input w-full",
         class: if validate { "validator" },
         disabled: attrs.disabled,
@@ -93,7 +93,7 @@ fn InputOtherNode(
                   serde_json::Value::String(s) => s,
                   serde_json::Value::Number(n) => n.to_string(),
                   serde_json::Value::Bool(b) => b.to_string(),
-                  serde_json::Value::Array(a) => format!("{:?}", a),
+                  serde_json::Value::Array(a) => format!("{a:?}"),
                   _ => "".to_string(),
               }
           } else {
@@ -113,7 +113,7 @@ fn InputOtherNode(
                 serde_json::Value::String(s) => s,
                 serde_json::Value::Number(n) => n.to_string(),
                 serde_json::Value::Bool(b) => b.to_string(),
-                serde_json::Value::Array(a) => format!("{:?}", a),
+                serde_json::Value::Array(a) => format!("{a:?}"),
                 _ => "".to_string(),
             }
         } else {
@@ -296,7 +296,7 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Hidden => {
                       rsx! {
                         input {
-                          autocomplete: if let Some(a) = i.autocomplete { format!("{:?}", a).to_lowercase() },
+                          autocomplete: if let Some(a) = i.autocomplete { format!("{a:?}").to_lowercase() },
                           disabled: i.disabled,
                           name: i.name,
                           id: if let Some(ref label) = node.meta.label { format!("{}", label.id) },

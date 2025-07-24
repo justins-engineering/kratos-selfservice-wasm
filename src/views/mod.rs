@@ -21,3 +21,6 @@ pub use verification::Verify;
 mod recovery;
 pub use recovery::AccountRecovery;
 pub use recovery::RecoveryFlow;
+
+mod session;
+pub use session::SessionInfo;

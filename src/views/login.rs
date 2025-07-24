@@ -26,7 +26,7 @@ pub fn SignIn() -> Element {
   return match &*create_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "Sign In" }
           div { class: "mx-auto w-full max-w-lg",
@@ -71,7 +71,7 @@ pub fn LoginFlow(flow: String) -> Element {
   return match &*get_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        debug!("{:#?}", res);
+        debug!("{res:#?}");
         rsx! {
           h1 { class: "text-center text-2xl", "Sign In" }
           div { class: "mx-auto w-full max-w-lg",

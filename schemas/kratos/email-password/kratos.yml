@@ -1,6 +1,9 @@
-version: v0.13.0
+version: v1.3.1
 
 dsn: memory
+
+session:
+  lifespan: 1h
 
 serve:
   public:
@@ -23,9 +26,9 @@ serve:
       exposed_headers:
         - Content-Type
         - Set-Cookie
-      allow_credentials: true
+      allow_credentials: false
   admin:
-    base_url: http://kratos:4434/
+    base_url: http://127.0.0.1:4434/
 
 selfservice:
   default_browser_return_url: http://127.0.0.1:4455/
@@ -71,11 +74,13 @@ selfservice:
 
     logout:
       after:
-        default_browser_return_url: http://127.0.0.1:4455/login
+        default_browser_return_url: http://127.0.0.1:4455/
 
     login:
       ui_url: http://127.0.0.1:4455/login
       lifespan: 10m
+      after:
+        default_browser_return_url: http://127.0.0.1:4455/session
 
     registration:
       lifespan: 10m
@@ -116,4 +121,6 @@ courier:
     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
 
 feature_flags:
-  use_continue_with_transitions: true
+  use_continue_with_transitions: false
+
+sqa-opt-out: true
