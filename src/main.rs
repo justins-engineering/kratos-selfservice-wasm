@@ -69,7 +69,7 @@ enum Route {
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
     #[end_layout]
-    #[route("/session")]
+    #[route("/state")]
       SessionState {},
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
@@ -126,6 +126,20 @@ fn Home() -> Element {
     }
     Cards {}
   }
+}
+
+pub fn set_session_state() {
+  let mut state = use_context::<Session>().state;
+
+  debug!("Setting Session state to true");
+  *state.write() = true;
+  let timeout = Timeout::new(KRATOS_LIFETIME, move || {
+    debug!("Setting Session state to false");
+    *state.write() = false;
+  });
+  timeout.forget();
+
+  navigator().replace(Route::Home {});
 }
 
 #[component]

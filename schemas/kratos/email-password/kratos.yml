@@ -80,7 +80,7 @@ selfservice:
       ui_url: http://127.0.0.1:4455/login
       lifespan: 10m
       after:
-        default_browser_return_url: http://127.0.0.1:4455/session
+        default_browser_return_url: http://127.0.0.1:4455/state
 
     registration:
       lifespan: 10m
