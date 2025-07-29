@@ -5,7 +5,7 @@ use ory_kratos_client::models::UiNodeAttributes::{Img, Input, Script, Text, A};
 #[component]
 fn InputFieldNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeInputAttributes>,
+  attrs: ory_kratos_client::models::UiNodeInputAttributes,
   validate: bool,
   pattern: Option<String>,
   hint: Option<Element>,
@@ -48,7 +48,7 @@ fn InputFieldNode(
 #[component]
 fn InputButtonNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeInputAttributes>,
+  attrs: ory_kratos_client::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     button {
@@ -77,7 +77,7 @@ fn InputButtonNode(
 #[component]
 fn InputOtherNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeInputAttributes>,
+  attrs: ory_kratos_client::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -127,7 +127,7 @@ fn InputOtherNode(
 #[component]
 fn InputCheckBoxNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeInputAttributes>,
+  attrs: ory_kratos_client::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -156,7 +156,7 @@ fn InputCheckBoxNode(
 #[component]
 fn ImageNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeImageAttributes>,
+  attrs: ory_kratos_client::models::UiNodeImageAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -184,7 +184,7 @@ fn ImageNode(
 #[component]
 fn TextNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeTextAttributes>,
+  attrs: ory_kratos_client::models::UiNodeTextAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -199,7 +199,7 @@ fn TextNode(
 #[component]
 fn LinkNode(
   meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: Box<ory_kratos_client::models::UiNodeAnchorAttributes>,
+  attrs: ory_kratos_client::models::UiNodeAnchorAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -217,7 +217,7 @@ fn LinkNode(
 }
 
 #[component]
-fn ScriptNode(attrs: Box<ory_kratos_client::models::UiNodeScriptAttributes>) -> Element {
+fn ScriptNode(attrs: ory_kratos_client::models::UiNodeScriptAttributes) -> Element {
   rsx! {
     script {
       r#async: attrs.r#async,
@@ -261,14 +261,14 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
               match i.r#type {
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Text => {
                       rsx! {
-                        InputFieldNode { meta: node.meta.label, attrs: i, validate: false }
+                        InputFieldNode { meta: node.meta.label, attrs: *i, validate: false }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Password => {
                       rsx! {
                         InputFieldNode {
                           meta: node.meta.label,
-                          attrs: i,
+                          attrs: *i,
                           validate: true,
                           hint: rsx! {
                             "Password must be more than 8 characters, and include:"
@@ -285,12 +285,12 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Number => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Checkbox => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Hidden => {
@@ -316,7 +316,7 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                       rsx! {
                         InputFieldNode {
                           meta: node.meta.label,
-                          attrs: i,
+                          attrs: *i,
                           validate: true,
                           hint: rsx! {
                             p { "Enter valid email address" }
@@ -326,54 +326,54 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Tel => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Submit => {
                       rsx! {
-                        InputButtonNode { meta: node.meta.label, attrs: i }
+                        InputButtonNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Button => {
                       rsx! {
-                        InputButtonNode { meta: node.meta.label, attrs: i }
+                        InputButtonNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::DatetimeLocal => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Date => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
                   ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Url => {
                       rsx! {
-                        InputOtherNode { meta: node.meta.label, attrs: i }
+                        InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
               }
           }
           Text(text) => {
               rsx! {
-                TextNode { meta: node.meta.label, attrs: text }
+                TextNode { meta: node.meta.label, attrs: *text }
               }
           }
           Img(img) => {
               rsx! {
-                ImageNode { meta: node.meta.label, attrs: img }
+                ImageNode { meta: node.meta.label, attrs: *img }
               }
           }
           A(link) => {
               rsx! {
-                LinkNode { meta: node.meta.label, attrs: link }
+                LinkNode { meta: node.meta.label, attrs: *link }
               }
           }
           Script(script) => {
               rsx! {
-                ScriptNode { attrs: script }
+                ScriptNode { attrs: *script }
               }
           }
       }
