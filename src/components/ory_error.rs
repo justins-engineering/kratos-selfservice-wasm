@@ -2,7 +2,8 @@ use crate::Route;
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::{
   CreateBrowserLoginFlowError, CreateBrowserLogoutFlowError, CreateBrowserRecoveryFlowError,
-  CreateBrowserRegistrationFlowError, ToSessionError,
+  CreateBrowserRegistrationFlowError, CreateBrowserSettingsFlowError,
+  CreateBrowserVerificationFlowError, ToSessionError,
 };
 use ory_kratos_client::apis::ResponseContent;
 use ory_kratos_client::models::error_generic::ErrorGeneric;
@@ -142,6 +143,57 @@ impl DisplayError for ResponseContent<CreateBrowserRecoveryFlowError> {
         CreateBrowserRecoveryFlowError::Status400(error_generic) => rsx! {
           {error_content_rsx(error_generic)}
         },
+      }
+    } else {
+      rsx! {
+        p { {self.content.to_string()} }
+      }
+    }
+  }
+}
+
+impl DisplayError for ResponseContent<CreateBrowserSettingsFlowError> {
+  fn view_response_content(self) -> Element {
+    if let Some(ent) = self.entity {
+      match ent {
+        CreateBrowserSettingsFlowError::DefaultResponse(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserSettingsFlowError::UnknownValue(value) => {
+          rsx! {
+            {error_content_js(value)}
+          }
+        }
+        CreateBrowserSettingsFlowError::Status400(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserSettingsFlowError::Status401(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserSettingsFlowError::Status403(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+      }
+    } else {
+      rsx! {
+        p { {self.content.to_string()} }
+      }
+    }
+  }
+}
+
+impl DisplayError for ResponseContent<CreateBrowserVerificationFlowError> {
+  fn view_response_content(self) -> Element {
+    if let Some(ent) = self.entity {
+      match ent {
+        CreateBrowserVerificationFlowError::DefaultResponse(error_generic) => rsx! {
+          {error_content_rsx(error_generic)}
+        },
+        CreateBrowserVerificationFlowError::UnknownValue(value) => {
+          rsx! {
+            {error_content_js(value)}
+          }
+        }
       }
     } else {
       rsx! {

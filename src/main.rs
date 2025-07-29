@@ -69,7 +69,7 @@ enum Route {
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
     #[end_layout]
-    #[route("/session")]
+    #[route("/state")]
       SessionState {},
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]

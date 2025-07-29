@@ -1,6 +1,6 @@
-use crate::components::FormBuilder;
+use crate::components::{DisplayError, FormBuilder};
 use crate::{Configuration, Create, Route};
-use dioxus::logger::tracing::debug;
+use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::{
   create_browser_verification_flow, get_verification_flow,
@@ -33,9 +33,14 @@ pub fn Verify() -> Element {
           }
         }
       }
+      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+        {res.to_owned().view_response_content()}
+      },
       Err(err) => {
+        error!("{err:#?}");
         rsx! {
-          p { "Failed to create VerificationFlow! Error: {err:?}" }
+          p { "Failed to get VerificationFlow! Error:" }
+          p { "{err:#?}" }
         }
       }
     },
@@ -45,9 +50,8 @@ pub fn Verify() -> Element {
 
 #[component]
 pub fn VerificationFlow(flow: String) -> Element {
-  let id = flow.clone();
   let get_flow = use_resource(move || {
-    let id = id.to_owned();
+    let id = flow.to_owned();
     async move { get_verification_flow(&Configuration::create(), &id, None).await }
   });
 

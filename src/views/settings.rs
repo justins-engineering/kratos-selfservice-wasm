@@ -1,6 +1,6 @@
-use crate::components::FormBuilder;
+use crate::components::{DisplayError, FormBuilder};
 use crate::{Configuration, Create, Route};
-use dioxus::logger::tracing::debug;
+use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
 use ory_kratos_client::apis::frontend_api::{create_browser_settings_flow, get_settings_flow};
 
@@ -21,9 +21,14 @@ pub fn Settings() -> Element {
           }
         }
       }
+      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+        {res.to_owned().view_response_content()}
+      },
       Err(err) => {
+        error!("{err:#?}");
         rsx! {
-          p { "Failed to create RegistrationFlow! Error: {err:?}" }
+          p { "Failed to get SeetingsFlow! Error:" }
+          p { "{err:#?}" }
         }
       }
     },
@@ -33,9 +38,8 @@ pub fn Settings() -> Element {
 
 #[component]
 pub fn SettingsFlow(flow: String) -> Element {
-  let id = flow.clone();
   let get_flow = use_resource(move || {
-    let id = id.to_owned();
+    let id = flow.to_owned();
     async move { get_settings_flow(&Configuration::create(), &id, None, None).await }
   });
 
@@ -51,7 +55,7 @@ pub fn SettingsFlow(flow: String) -> Element {
         }
       }
       Err(err) => {
-        navigator().replace(Route::SignUp {});
+        navigator().replace(Route::SessionInfo {});
         rsx! {
           p { "Failed to get RegistrationFlow! Error: {err:?}" }
         }

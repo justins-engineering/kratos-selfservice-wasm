@@ -178,7 +178,7 @@ pub fn SessionInfo() -> Element {
         }
       }
       Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
-        {res.clone().view_response_content()}
+        {res.to_owned().view_response_content()}
       },
 
       Err(err) => {

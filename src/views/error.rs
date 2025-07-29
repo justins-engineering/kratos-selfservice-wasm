@@ -18,7 +18,7 @@ pub fn PageNotFound(route: Vec<String>) -> Element {
 
 #[component]
 pub fn ServerError(id: String) -> Element {
-  let err_id = id.clone().to_owned();
+  let err_id = id.clone();
   let future = use_resource(move || {
     let err_id = err_id.to_owned();
     async move { get_flow_error(&Configuration::create(), &err_id).await }

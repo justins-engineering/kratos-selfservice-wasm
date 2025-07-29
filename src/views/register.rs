@@ -35,7 +35,7 @@ pub fn SignUp() -> Element {
         }
       }
       Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
-        {res.clone().view_response_content()}
+        {res.to_owned().view_response_content()}
       },
 
       Err(err) => {
@@ -52,9 +52,8 @@ pub fn SignUp() -> Element {
 
 #[component]
 pub fn RegisterFlow(flow: String) -> Element {
-  let id = flow.clone();
   let get_flow = use_resource(move || {
-    let id = id.to_owned();
+    let id = flow.to_owned();
     async move { get_registration_flow(&Configuration::create(), &id, None).await }
   });
 
