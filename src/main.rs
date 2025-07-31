@@ -1,8 +1,10 @@
 mod components;
-use crate::components::OryLogOut;
-use dioxus::{logger::tracing::debug, prelude::*};
-use ory_kratos_client::apis::configuration::Configuration;
 mod views;
+
+use crate::components::{use_session_state, OryLogOut, OrySession};
+use dioxus::prelude::*;
+use ory_kratos_client::{apis::configuration::Configuration, models::session};
+
 use crate::views::{
   AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, SessionInfo,
   Settings, SettingsFlow, SignIn, SignUp, VerificationFlow, Verify,
@@ -11,16 +13,17 @@ use crate::views::{
 #[cfg(feature = "web")]
 use gloo_timers::callback::Timeout;
 
-// use dioxus::logger::tracing::{debug, error};
-// use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
+use dioxus::logger::tracing::{debug, error};
+use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
 
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
 const KRATOS_LIFETIME_MINUTES: u32 = 60;
 const KRATOS_LIFETIME: u32 = KRATOS_LIFETIME_MINUTES * 60 * 1000;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Session {
   state: Signal<bool>,
+  timeout: Signal<Option<gloo_timers::callback::Timeout>>,
 }
 
 trait Create {
@@ -31,7 +34,7 @@ impl Create for Configuration {
   fn create() -> Configuration {
     Configuration {
       base_path: KRATOS_BROWSER_URL.to_owned(),
-      user_agent: None, //Some(USER_AGENT.to_owned()),
+      user_agent: None,
       basic_auth: None,
       oauth_access_token: None,
       bearer_access_token: None,
@@ -69,8 +72,8 @@ enum Route {
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
     #[end_layout]
-    #[route("/state")]
-      SessionState {},
+    #[route("/session/state")]
+      SetOrySession {},
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
     ServerError { id: String },
@@ -86,29 +89,60 @@ fn main() {
   dioxus::launch(App);
 }
 
+fn kratos_check() {
+  spawn(async move {
+    match is_alive(&Configuration::create()).await {
+      Ok(r) => debug!("Kratos liveliness check: {}", r.status),
+      Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
+    };
+
+    match is_ready(&Configuration::create()).await {
+      Ok(r) => debug!("Kratos readiness check: {}", r.status),
+      Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
+    };
+  });
+}
+
 #[component]
 fn App() -> Element {
   use_context_provider(|| Session {
     state: Signal::new(false),
+    timeout: Signal::new(None),
   });
-
-  // spawn(async move {
-  //   match is_alive(&Configuration::create()).await {
-  //     Ok(r) => debug!("Kratos liveliness check: {}", r.status),
-  //     Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
-  //   };
-
-  //   match is_ready(&Configuration::create()).await {
-  //     Ok(r) => debug!("Kratos readiness check: {}", r.status),
-  //     Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
-  //   };
-  // });
 
   rsx! {
     document::Link { rel: "icon", href: FAVICON }
     document::Link { rel: "stylesheet", href: TAILWIND_CSS }
     Router::<Route> {}
   }
+}
+
+#[component]
+fn SetOrySession() -> Element {
+  // let session = move || async move { use_session_state().await };
+
+  let update = use_resource(move || async move { use_session_state().await });
+
+  // *use_context::<Session>().state.write() = session.0;
+  // *use_context::<Session>().timeout.write() = session.1;
+  // navigator().replace(Route::Home {});
+  return match &*update.read() {
+    Some(result) => {
+      match result {
+        Ok(session) => {
+          *use_context::<Session>().state.write() = session.0;
+          // *use_context::<Session>().timeout.write() = session.1;
+          rsx! {
+            {format!("{:#?}", use_context::<Session>())}
+          }
+        }
+        Err(err) => rsx! {
+          p { {err.to_owned()} }
+        },
+      }
+    }
+    None => rsx! {},
+  };
 }
 
 /// Home page
@@ -126,22 +160,6 @@ fn Home() -> Element {
     }
     Cards {}
   }
-}
-
-#[component]
-fn SessionState() -> Element {
-  let mut state = use_context::<Session>().state;
-
-  debug!("Setting Session state to true");
-  *state.write() = true;
-  let timeout = Timeout::new(KRATOS_LIFETIME, move || {
-    debug!("Setting Session state to false");
-    *state.write() = false;
-  });
-  timeout.forget();
-
-  navigator().replace(Route::Home {});
-  rsx! {}
 }
 
 /// Shared navbar component.
