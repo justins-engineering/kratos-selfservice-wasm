@@ -3,7 +3,7 @@ version: v1.3.1
 dsn: memory
 
 session:
-  lifespan: 1h
+  lifespan: 4h
 
 serve:
   public:
@@ -74,13 +74,13 @@ selfservice:
 
     logout:
       after:
-        default_browser_return_url: http://127.0.0.1:4455/
+        default_browser_return_url: http://127.0.0.1:4455/session/local?state=false
 
     login:
       ui_url: http://127.0.0.1:4455/login
       lifespan: 10m
       after:
-        default_browser_return_url: http://127.0.0.1:4455/session/state
+        default_browser_return_url: http://127.0.0.1:4455/session/local?state=true
 
     registration:
       lifespan: 10m

@@ -13,9 +13,8 @@ pub fn OryLogOut() -> Element {
   return match &*create_flow.read() {
     Some(new_flow) => match new_flow {
       Ok(res) => {
-        // debug!("{res:#?}");
         rsx! {
-          a { href: res.logout_url.to_owned(), "Log out" }
+          a { href: res.logout_url.clone(), "Log out" }
         }
       }
       Err(ory_kratos_client::apis::Error::ResponseError(res)) => {
@@ -24,7 +23,7 @@ pub fn OryLogOut() -> Element {
       }
 
       Err(err) => {
-        // error!("{err:#?}");
+        error!("{err:#?}");
         rsx! {}
       }
     },
