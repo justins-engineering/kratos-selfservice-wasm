@@ -2,7 +2,7 @@ mod components;
 mod views;
 
 use crate::components::{
-  remove_session_cookie, session_cookie_valid, set_session_cookie, OryLogOut,
+  remove_session_cookie, session_cookie_valid, set_session_cookie, OryLogOut, SetSessionCookie,
 };
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
@@ -72,7 +72,7 @@ enum Route {
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
       #[route("/session/local?:state")]
-      SetOrySession { state: bool },
+      SetSessionCookie { state: bool },
     #[end_layout]
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
@@ -117,31 +117,31 @@ fn App() -> Element {
   }
 }
 
-#[component]
-fn SetOrySession(state: bool) -> Element {
-  use_effect(move || {
-    let timeout = Timeout::new(5, move || {
-      let _ = web_sys::window()
-        .expect("Could not access window")
-        .location()
-        .replace("/");
-    });
-    timeout.forget();
-  });
+// #[component]
+// fn SetOrySession(state: bool) -> Element {
+//   use_effect(move || {
+//     let timeout = Timeout::new(5, move || {
+//       let _ = web_sys::window()
+//         .expect("Could not access window")
+//         .location()
+//         .replace("/");
+//     });
+//     timeout.forget();
+//   });
 
-  rsx! {
-    if state {
-      {*use_context::<Session>().state.write() = set_session_cookie()}
-      p { "Logging In" }
-    } else {
-      {
-          remove_session_cookie();
-          navigator().push(Route::Home {});
-      }
-      p { "Logging Out" }
-    }
-  }
-}
+//   rsx! {
+//     if state {
+//       {*use_context::<Session>().state.write() = set_session_cookie()}
+//       p { "Logging In" }
+//     } else {
+//       {
+//           remove_session_cookie();
+//           navigator().push(Route::Home {});
+//       }
+//       p { "Logging Out" }
+//     }
+//   }
+// }
 
 /// Home page
 #[component]

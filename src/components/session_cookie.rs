@@ -1,4 +1,4 @@
-use crate::{Configuration, Create, Session, SESSION_COOKIE_NAME};
+use crate::{Configuration, Create, Route, Session, SESSION_COOKIE_NAME};
 use chrono::{DateTime, FixedOffset, Utc};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
@@ -109,6 +109,55 @@ pub fn set_session_cookie() -> bool {
   debug!("{:?}", html_document.cookie());
 
   false
+}
+
+#[component]
+pub fn SetSessionCookie(state: bool) -> Element {
+  let html_document: web_sys::HtmlDocument = html_document!(window!());
+
+  let create_flow: Resource<Result<_, ory_kratos_client::apis::Error<_>>> = use_resource(
+    move || async move { to_session(&Configuration::create(), None, None, None).await },
+  );
+
+  if state {
+    if let Some(Ok(session)) = &*create_flow.read() {
+      if let Some(expires_at) = &session.expires_at {
+        let timestamp = DateTime::parse_from_rfc3339(expires_at);
+        match timestamp {
+          Ok(dt) => {
+            let duration = dt.signed_duration_since(Utc::now()).num_milliseconds();
+            let duration = duration.try_into().unwrap_or(0);
+
+            let mut cookie_str = String::with_capacity(COOKIE_STR_LEN);
+            cookie_str.push_str(SESSION_COOKIE_NAME);
+            cookie_str.push('=');
+            cookie_str.push_str(expires_at);
+            cookie_str.push_str("; path=/; SameSite=Strict; max-age=");
+            cookie_str.push_str(&(duration / 1000).to_string());
+            cookie_str.push_str("; Secure");
+
+            let new_cookie = html_document.set_cookie(&cookie_str);
+
+            match new_cookie {
+              Ok(_) => {
+                navigator().replace(Route::Home {});
+              }
+              Err(_) => {
+                error!("Failed to set cookie");
+              }
+            }
+          }
+          Err(err) => error!("{err:?}"),
+        }
+      }
+    };
+  } else {
+    remove_session_cookie();
+    navigator().replace(Route::Home {});
+  }
+  debug!("{:?}", html_document.cookie());
+
+  rsx!()
 }
 
 pub fn session_cookie_valid() -> bool {
