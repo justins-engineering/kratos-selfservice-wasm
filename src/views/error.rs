@@ -1,6 +1,6 @@
 use crate::{Configuration, Create, Route};
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::get_flow_error;
+use ory_kratos_client_wasm::apis::frontend_api::get_flow_error;
 
 #[component]
 pub fn PageNotFound(route: Vec<String>) -> Element {

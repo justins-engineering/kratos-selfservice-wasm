@@ -1,8 +1,7 @@
-use crate::components::DisplayError;
 use crate::{Configuration, Create};
-use dioxus::logger::tracing::{debug, error};
+use dioxus::logger::tracing::error;
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::create_browser_logout_flow;
+use ory_kratos_client_wasm::apis::frontend_api::create_browser_logout_flow;
 
 #[component]
 pub fn OryLogOut() -> Element {
@@ -17,11 +16,6 @@ pub fn OryLogOut() -> Element {
           a { href: res.logout_url.clone(), "Log out" }
         }
       }
-      Err(ory_kratos_client::apis::Error::ResponseError(res)) => {
-        // error!("{res:#?}");
-        rsx! {}
-      }
-
       Err(err) => {
         error!("{err:#?}");
         rsx! {}

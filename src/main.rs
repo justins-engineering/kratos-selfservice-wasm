@@ -2,11 +2,11 @@ mod components;
 mod views;
 
 use crate::components::{
-  remove_session_cookie, session_cookie_valid, set_session_cookie, OryLogOut, SetSessionCookie,
+  OryLogOut, SetSessionCookie, remove_session_cookie, session_cookie_valid, set_session_cookie,
 };
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
-use ory_kratos_client::apis::configuration::Configuration;
+use ory_kratos_client_wasm::apis::configuration::Configuration;
 
 use crate::views::{
   AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, SessionInfo,
@@ -16,7 +16,7 @@ use crate::views::{
 #[cfg(feature = "web")]
 use gloo_timers::callback::Timeout;
 
-use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
+use ory_kratos_client_wasm::apis::metadata_api::{is_alive, is_ready};
 
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
 const SESSION_COOKIE_NAME: &str = "session_expiry";

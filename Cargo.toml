@@ -1,24 +1,21 @@
 [package]
-name = "dioxus"
+name = "kratos-selfservice-rust"
 version = "0.1.0"
-authors = ["justin <code@jes.contact>"]
-edition = "2021"
+authors = ["JES <justin@jes.contact>"]
+edition = "2024"
 
 [dependencies]
 dioxus = { version = "0.6.0", features = ["router"] }
-# web-time = { version = "1.1.0", optional = true }
-# js-sys = { version = "0.3.77", optional = true }
 chrono = { version = "0.4.41", default-features = false, features = ["now", "wasmbind"]}
 gloo-timers = { version = "0.3", optional = true  }
 # Work around for https://github.com/ory/kratos-client-rust/issues/3
-ory-kratos-client = { path = "./modules/kratos-client-rust"}
+ory-kratos-client-wasm = "0.1.1"
 serde_json = "1.0"
 web-sys = { version = "0.3.77", features = ["Headers", "HtmlDocument", "Window"] }
 
 
 [features]
 default = ["web"]
-# web = ["dioxus/web", "dep:web-time", "dep:js-sys", "dep:gloo-timers"]
 web = ["dioxus/web", "dep:gloo-timers"]
 desktop = ["dioxus/desktop"]
 mobile = ["dioxus/mobile"]

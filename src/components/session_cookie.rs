@@ -1,8 +1,8 @@
-use crate::{Configuration, Create, Route, Session, SESSION_COOKIE_NAME};
+use crate::{Configuration, Create, Route, SESSION_COOKIE_NAME, Session};
 use chrono::{DateTime, FixedOffset, Utc};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::to_session;
+use ory_kratos_client_wasm::apis::frontend_api::to_session;
 
 #[cfg(feature = "web")]
 use gloo_timers::callback::Timeout;
@@ -66,7 +66,7 @@ pub fn remove_session_cookie() {
 pub fn set_session_cookie() -> bool {
   let html_document: web_sys::HtmlDocument = html_document!(window!());
 
-  let create_flow: Resource<Result<_, ory_kratos_client::apis::Error<_>>> = use_resource(
+  let create_flow: Resource<Result<_, ory_kratos_client_wasm::apis::Error<_>>> = use_resource(
     move || async move { to_session(&Configuration::create(), None, None, None).await },
   );
 
@@ -115,7 +115,7 @@ pub fn set_session_cookie() -> bool {
 pub fn SetSessionCookie(state: bool) -> Element {
   let html_document: web_sys::HtmlDocument = html_document!(window!());
 
-  let create_flow: Resource<Result<_, ory_kratos_client::apis::Error<_>>> = use_resource(
+  let create_flow: Resource<Result<_, ory_kratos_client_wasm::apis::Error<_>>> = use_resource(
     move || async move { to_session(&Configuration::create(), None, None, None).await },
   );
 

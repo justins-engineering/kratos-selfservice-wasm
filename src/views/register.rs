@@ -1,9 +1,8 @@
 use crate::components::{DisplayError, FormBuilder};
-// use crate::components::{FormBuilder, OryError};
 use crate::{Configuration, Create, Route};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::{
+use ory_kratos_client_wasm::apis::frontend_api::{
   create_browser_registration_flow, get_registration_flow,
 };
 
@@ -34,7 +33,7 @@ pub fn SignUp() -> Element {
           }
         }
       }
-      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+      Err(ory_kratos_client_wasm::apis::Error::ResponseError(res)) => rsx! {
         {res.to_owned().view_response_content()}
       },
 

@@ -1,12 +1,12 @@
 use crate::Route;
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::{
+use ory_kratos_client_wasm::apis::ResponseContent;
+use ory_kratos_client_wasm::apis::frontend_api::{
   CreateBrowserLoginFlowError, CreateBrowserLogoutFlowError, CreateBrowserRecoveryFlowError,
   CreateBrowserRegistrationFlowError, CreateBrowserSettingsFlowError,
   CreateBrowserVerificationFlowError, ToSessionError,
 };
-use ory_kratos_client::apis::ResponseContent;
-use ory_kratos_client::models::error_generic::ErrorGeneric;
+use ory_kratos_client_wasm::models::error_generic::ErrorGeneric;
 
 fn error_content_rsx(err: ErrorGeneric) -> Element {
   rsx! {
