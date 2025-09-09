@@ -9,7 +9,7 @@ dioxus = { version = "0.6.0", features = ["router"] }
 chrono = { version = "0.4.41", default-features = false, features = ["now", "wasmbind"]}
 gloo-timers = { version = "0.3", optional = true  }
 # Work around for https://github.com/ory/kratos-client-rust/issues/3
-ory-kratos-client-wasm = "0.1.1"
+ory-kratos-client-wasm = "0.1"
 serde_json = "1.0"
 web-sys = { version = "0.3.77", features = ["Headers", "HtmlDocument", "Window"] }
 

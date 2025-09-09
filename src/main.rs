@@ -147,13 +147,13 @@ fn App() -> Element {
 #[component]
 fn Home() -> Element {
   rsx! {
-    article { class: "prose max-w-none",
-      h1 { "Welcome to the Ory Account Experience!" }
-      p {
+    article { class: "max-w-none",
+      h1 { class: "mb-8 text-4xl font-extrabold", "Welcome to the Ory Account Experience!" }
+      p { class: "my-5 text-base-content opacity-80",
         "Let your customers sign up, log in and manage their account using Ory's standard experience. Here you can preview, test and learn to integrate it into your application."
       }
-      hr {}
-      h2 { "Core concepts" }
+      hr { class: "my-12 border-base-content" }
+      h2 { class: "my-4 text-2xl font-bold", "Core concepts" }
       p { "Here are some useful documentation pieces that help you get started right away." }
     }
     Cards {}
