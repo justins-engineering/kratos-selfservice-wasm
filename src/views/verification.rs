@@ -2,7 +2,7 @@ use crate::components::{DisplayError, FormBuilder};
 use crate::{Configuration, Create, Route};
 use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::{
+use ory_kratos_client_wasm::apis::frontend_api::{
   create_browser_verification_flow, get_verification_flow,
 };
 
@@ -33,7 +33,7 @@ pub fn Verify() -> Element {
           }
         }
       }
-      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+      Err(ory_kratos_client_wasm::apis::Error::ResponseError(res)) => rsx! {
         {res.to_owned().view_response_content()}
       },
       Err(err) => {

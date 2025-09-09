@@ -1,8 +1,9 @@
 {
   "dependencies": {
-    "@tailwindcss/cli": "^4.1.11",
-    "@tailwindcss/typography": "^0.5.16",
-    "daisyui": "^5.0.50",
-    "tailwindcss": "^4.1.11"
+    "daisyui": "^5.1.9",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13"
   }
 }

@@ -2,13 +2,13 @@ use std::format;
 
 use crate::components::DisplayError;
 use crate::{Configuration, Create};
-use dioxus::logger::tracing::{debug, error};
+use dioxus::logger::tracing::error;
 use dioxus::prelude::*;
-use ory_kratos_client::apis::frontend_api::to_session;
+use ory_kratos_client_wasm::apis::frontend_api::to_session;
 
 #[component]
 pub fn SessionInfo() -> Element {
-  let create_flow: Resource<Result<_, ory_kratos_client::apis::Error<_>>> = use_resource(
+  let create_flow: Resource<Result<_, ory_kratos_client_wasm::apis::Error<_>>> = use_resource(
     move || async move { to_session(&Configuration::create(), None, None, None).await },
   );
 
@@ -177,7 +177,7 @@ pub fn SessionInfo() -> Element {
           }
         }
       }
-      Err(ory_kratos_client::apis::Error::ResponseError(res)) => rsx! {
+      Err(ory_kratos_client_wasm::apis::Error::ResponseError(res)) => rsx! {
         {res.to_owned().view_response_content()}
       },
 

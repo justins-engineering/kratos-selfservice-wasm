@@ -1,8 +1,13 @@
 mod components;
-use crate::components::OryLogOut;
-use dioxus::{logger::tracing::debug, prelude::*};
-use ory_kratos_client::apis::configuration::Configuration;
 mod views;
+
+use crate::components::{
+  OryLogOut, SetSessionCookie, remove_session_cookie, session_cookie_valid, set_session_cookie,
+};
+use dioxus::logger::tracing::{debug, error};
+use dioxus::prelude::*;
+use ory_kratos_client_wasm::apis::configuration::Configuration;
+
 use crate::views::{
   AccountRecovery, LoginFlow, PageNotFound, RecoveryFlow, RegisterFlow, ServerError, SessionInfo,
   Settings, SettingsFlow, SignIn, SignUp, VerificationFlow, Verify,
@@ -11,14 +16,10 @@ use crate::views::{
 #[cfg(feature = "web")]
 use gloo_timers::callback::Timeout;
 
-// use dioxus::logger::tracing::{debug, error};
-// use ory_kratos_client::apis::metadata_api::{is_alive, is_ready};
-
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
-const KRATOS_LIFETIME_MINUTES: u32 = 60;
-const KRATOS_LIFETIME: u32 = KRATOS_LIFETIME_MINUTES * 60 * 1000;
+const SESSION_COOKIE_NAME: &str = "session_expiry";
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Session {
   state: Signal<bool>,
 }
@@ -31,7 +32,7 @@ impl Create for Configuration {
   fn create() -> Configuration {
     Configuration {
       base_path: KRATOS_BROWSER_URL.to_owned(),
-      user_agent: None, //Some(USER_AGENT.to_owned()),
+      user_agent: None,
       basic_auth: None,
       oauth_access_token: None,
       bearer_access_token: None,
@@ -68,9 +69,9 @@ enum Route {
       AccountRecovery {},
       #[route("/recovery?:flow")]
       RecoveryFlow { flow: String },
+      #[route("/session/local?:state")]
+      SetSessionCookie { state: bool },
     #[end_layout]
-    #[route("/state")]
-      SessionState {},
     // PageNotFound is a catch all route that will match any route and placing the matched segments in the route field
     #[route("/error?:id")]
     ServerError { id: String },
@@ -89,20 +90,9 @@ fn main() {
 #[component]
 fn App() -> Element {
   use_context_provider(|| Session {
+    // state: Signal::new(session_cookie_valid()),
     state: Signal::new(false),
   });
-
-  // spawn(async move {
-  //   match is_alive(&Configuration::create()).await {
-  //     Ok(r) => debug!("Kratos liveliness check: {}", r.status),
-  //     Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
-  //   };
-
-  //   match is_ready(&Configuration::create()).await {
-  //     Ok(r) => debug!("Kratos readiness check: {}", r.status),
-  //     Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
-  //   };
-  // });
 
   rsx! {
     document::Link { rel: "icon", href: FAVICON }
@@ -111,43 +101,102 @@ fn App() -> Element {
   }
 }
 
+// #[component]
+// fn SetOrySession(state: bool) -> Element {
+//   use_effect(move || {
+//     let timeout = Timeout::new(5, move || {
+//       let _ = web_sys::window()
+//         .expect("Could not access window")
+//         .location()
+//         .replace("/");
+//     });
+//     timeout.forget();
+//   });
+
+//   rsx! {
+//     if state {
+//       {*use_context::<Session>().state.write() = set_session_cookie()}
+//       p { "Logging In" }
+//     } else {
+//       {
+//           remove_session_cookie();
+//           navigator().push(Route::Home {});
+//       }
+//       p { "Logging Out" }
+//     }
+//   }
+// }
+
 /// Home page
 #[component]
 fn Home() -> Element {
   rsx! {
-    article { class: "prose max-w-none",
-      h1 { "Welcome to the Ory Account Experience!" }
-      p {
+    article { class: "max-w-none",
+      h1 { class: "mb-8 text-4xl font-extrabold", "Welcome to the Ory Account Experience!" }
+      p { class: "my-5 text-base-content opacity-80",
         "Let your customers sign up, log in and manage their account using Ory's standard experience. Here you can preview, test and learn to integrate it into your application."
       }
-      hr {}
-      h2 { "Core concepts" }
+      hr { class: "my-12 border-base-content" }
+      h2 { class: "my-4 text-2xl font-bold", "Core concepts" }
       p { "Here are some useful documentation pieces that help you get started right away." }
     }
     Cards {}
   }
 }
 
-#[component]
-fn SessionState() -> Element {
-  let mut state = use_context::<Session>().state;
-
-  debug!("Setting Session state to true");
-  *state.write() = true;
-  let timeout = Timeout::new(KRATOS_LIFETIME, move || {
-    debug!("Setting Session state to false");
-    *state.write() = false;
-  });
-  timeout.forget();
-
-  navigator().replace(Route::Home {});
-  rsx! {}
-}
-
 /// Shared navbar component.
 #[component]
 fn Navbar() -> Element {
-  let loged_in = use_context::<Session>().state;
+  // let session_valid = use_context::<Session>().state;
+  // let session = use_resource(move || async move { session_cookie_valid().await });
+  // let session_valid = session_cookie_valid();
+
+  let mut links = use_signal(|| {
+    rsx! {
+      li {
+        Link { to: Route::SignIn {}, "Sign In" }
+      }
+      li {
+        Link { to: Route::SignUp {}, "Sign Up" }
+      }
+      li {
+        Link { to: Route::AccountRecovery {}, "Account Recovery" }
+      }
+      li {
+        Link { to: Route::Verify {}, "Account Verification" }
+      }
+      li { class: "menu-disabled",
+        Link { to: Route::Settings {}, "Account Settings" }
+      }
+      li { class: "menu-disabled",
+        a { href: "{KRATOS_BROWSER_URL}/self-service/logout", "Log out" }
+      }
+    }
+  });
+
+  use_effect(move || {
+    if session_cookie_valid() {
+      *links.write() = rsx! {
+        li { class: "menu-disabled",
+          Link { to: Route::SignIn {}, "Sign In" }
+        }
+        li { class: "menu-disabled",
+          Link { to: Route::SignUp {}, "Sign Up" }
+        }
+        li { class: "menu-disabled",
+          Link { to: Route::AccountRecovery {}, "Account Recovery" }
+        }
+        li {
+          Link { to: Route::Verify {}, "Account Verification" }
+        }
+        li {
+          Link { to: Route::Settings {}, "Account Settings" }
+        }
+        li { OryLogOut {} }
+      }
+    }
+  });
+
   rsx! {
     div { class: "drawer lg:drawer-open",
       input {
@@ -181,48 +230,9 @@ fn Navbar() -> Element {
           }
           li {
             h2 { class: "menu-title", "Default User Interfaces" }
-            ul {
-              if !loged_in() {
-                li {
-                  Link { to: Route::SignIn {}, "Sign In" }
-                }
-                li {
-                  Link { to: Route::SignUp {}, "Sign Up" }
-                }
-                li {
-                  Link { to: Route::AccountRecovery {}, "Account Recovery" }
-                }
-                li {
-                  Link { to: Route::Verify {}, "Account Verification" }
-                }
-                li { class: "menu-disabled",
-                  Link { to: Route::Settings {}, "Account Settings" }
-                }
-                li { class: "menu-disabled",
-                  a { href: "{KRATOS_BROWSER_URL}/self-service/logout",
-                    "Log out"
-                  }
-                }
-              } else {
-                li { class: "menu-disabled",
-                  Link { to: Route::SignIn {}, "Sign In" }
-                }
-                li { class: "menu-disabled",
-                  Link { to: Route::SignUp {}, "Sign Up" }
-                }
-                li { class: "menu-disabled",
-                  Link { to: Route::AccountRecovery {}, "Account Recovery" }
-                }
-                li {
-                  Link { to: Route::Verify {}, "Account Verification" }
-                }
-                li {
-                  Link { to: Route::Settings {}, "Account Settings" }
-                }
-                li { OryLogOut {} }
-              }
-            }
+            ul { {links()} }
           }
+                // p { {format!("{:#?}", use_context::<Session>())} }
         }
       }
     }

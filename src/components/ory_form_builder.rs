@@ -1,11 +1,11 @@
 use dioxus::logger::tracing::error;
 use dioxus::prelude::*;
-use ory_kratos_client::models::UiNodeAttributes::{Img, Input, Script, Text, A};
+use ory_kratos_client_wasm::models::UiNodeAttributes::{A, Img, Input, Script, Text};
 
 #[component]
 fn InputFieldNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeInputAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeInputAttributes,
   validate: bool,
   pattern: Option<String>,
   hint: Option<Element>,
@@ -47,8 +47,8 @@ fn InputFieldNode(
 
 #[component]
 fn InputButtonNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeInputAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     button {
@@ -76,8 +76,8 @@ fn InputButtonNode(
 
 #[component]
 fn InputOtherNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeInputAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -126,8 +126,8 @@ fn InputOtherNode(
 
 #[component]
 fn InputCheckBoxNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeInputAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeInputAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -155,8 +155,8 @@ fn InputCheckBoxNode(
 
 #[component]
 fn ImageNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeImageAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeImageAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -183,8 +183,8 @@ fn ImageNode(
 
 #[component]
 fn TextNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeTextAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeTextAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -198,8 +198,8 @@ fn TextNode(
 
 #[component]
 fn LinkNode(
-  meta: Option<Box<ory_kratos_client::models::UiText>>,
-  attrs: ory_kratos_client::models::UiNodeAnchorAttributes,
+  meta: Option<Box<ory_kratos_client_wasm::models::UiText>>,
+  attrs: ory_kratos_client_wasm::models::UiNodeAnchorAttributes,
 ) -> Element {
   rsx! {
     if let Some(ref label) = meta {
@@ -217,7 +217,7 @@ fn LinkNode(
 }
 
 #[component]
-fn ScriptNode(attrs: ory_kratos_client::models::UiNodeScriptAttributes) -> Element {
+fn ScriptNode(attrs: ory_kratos_client_wasm::models::UiNodeScriptAttributes) -> Element {
   rsx! {
     script {
       r#async: attrs.r#async,
@@ -233,16 +233,18 @@ fn ScriptNode(attrs: ory_kratos_client::models::UiNodeScriptAttributes) -> Eleme
 }
 
 #[component]
-fn MessageNode(message: ory_kratos_client::models::UiText) -> Element {
+fn MessageNode(message: ory_kratos_client_wasm::models::UiText) -> Element {
   rsx! {
     div {
       id: message.id,
       role: "alert",
       class: {
           match message.r#type {
-              ory_kratos_client::models::ui_text::TypeEnum::Error => "alert alert-error",
-              ory_kratos_client::models::ui_text::TypeEnum::Info => "alert alert-info",
-              ory_kratos_client::models::ui_text::TypeEnum::Success => {
+              ory_kratos_client_wasm::models::ui_text::TypeEnum::Error => {
+                  "alert alert-error"
+              }
+              ory_kratos_client_wasm::models::ui_text::TypeEnum::Info => "alert alert-info",
+              ory_kratos_client_wasm::models::ui_text::TypeEnum::Success => {
                   "alert alert-success"
               }
           }
@@ -253,18 +255,18 @@ fn MessageNode(message: ory_kratos_client::models::UiText) -> Element {
 }
 
 #[component]
-fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
+fn NodeBuilder(nodes: Vec<ory_kratos_client_wasm::models::UiNode>) -> Element {
   rsx! {
     for node in nodes {
       match *node.attributes {
           Input(i) => {
               match i.r#type {
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Text => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Text => {
                       rsx! {
                         InputFieldNode { meta: node.meta.label, attrs: *i, validate: false }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Password => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Password => {
                       rsx! {
                         InputFieldNode {
                           meta: node.meta.label,
@@ -283,17 +285,17 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                         }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Number => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Number => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Checkbox => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Checkbox => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Hidden => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Hidden => {
                       rsx! {
                         input {
                           autocomplete: if let Some(a) = i.autocomplete { format!("{a:?}").to_lowercase() },
@@ -312,7 +314,7 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                         }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Email => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Email => {
                       rsx! {
                         InputFieldNode {
                           meta: node.meta.label,
@@ -324,32 +326,32 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
                         }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Tel => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Tel => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Submit => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Submit => {
                       rsx! {
                         InputButtonNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Button => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Button => {
                       rsx! {
                         InputButtonNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::DatetimeLocal => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::DatetimeLocal => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Date => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Date => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
                   }
-                  ory_kratos_client::models::ui_node_input_attributes::TypeEnum::Url => {
+                  ory_kratos_client_wasm::models::ui_node_input_attributes::TypeEnum::Url => {
                       rsx! {
                         InputOtherNode { meta: node.meta.label, attrs: *i }
                       }
@@ -382,11 +384,11 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client::models::UiNode>) -> Element {
 }
 
 #[component]
-pub fn FormBuilder(ui: ory_kratos_client::models::UiContainer) -> Element {
+pub fn FormBuilder(ui: ory_kratos_client_wasm::models::UiContainer) -> Element {
   let default = ui
     .nodes
     .extract_if(.., |n| {
-      n.group == ory_kratos_client::models::ui_node::GroupEnum::Default
+      n.group == ory_kratos_client_wasm::models::ui_node::GroupEnum::Default
     })
     .collect::<Vec<_>>();
 
@@ -431,18 +433,20 @@ pub fn FormBuilder(ui: ory_kratos_client::models::UiContainer) -> Element {
               legend { class: "fieldset-legend text-xl",
                 {
                     match node_group[0].group {
-                        ory_kratos_client::models::ui_node::GroupEnum::Password => "Password",
-                        ory_kratos_client::models::ui_node::GroupEnum::Oidc => "OIDC",
-                        ory_kratos_client::models::ui_node::GroupEnum::Profile => "Profile",
-                        ory_kratos_client::models::ui_node::GroupEnum::Code => "Code",
-                        ory_kratos_client::models::ui_node::GroupEnum::Totp => "TOTP",
-                        ory_kratos_client::models::ui_node::GroupEnum::LookupSecret => "Recovery",
-                        ory_kratos_client::models::ui_node::GroupEnum::Webauthn => {
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Password => "Password",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Oidc => "OIDC",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Profile => "Profile",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Code => "Code",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Totp => "TOTP",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::LookupSecret => {
+                            "Recovery"
+                        }
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Webauthn => {
                             "Web Authentication"
                         }
-                        ory_kratos_client::models::ui_node::GroupEnum::Passkey => "Passkey",
-                        ory_kratos_client::models::ui_node::GroupEnum::Captcha => "Captcha",
-                        ory_kratos_client::models::ui_node::GroupEnum::Saml => "SAML",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Passkey => "Passkey",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Captcha => "Captcha",
+                        ory_kratos_client_wasm::models::ui_node::GroupEnum::Saml => "SAML",
                         _ => "",
                     }
                 }

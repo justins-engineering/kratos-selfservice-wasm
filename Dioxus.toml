@@ -1,4 +1,12 @@
 [application]
+name = "kratos-selfservice-rust"
+asset_dir = "public"
+out_dir = "dist"
+
+[bundle]
+copyright = "Justin's Engineering Services, LLC"
+identifier = "com.justinsengineering"
+publisher = "Justin's Engineering Services, LLC"
 
 [web.app]
 

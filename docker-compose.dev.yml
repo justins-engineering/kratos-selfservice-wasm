@@ -39,14 +39,17 @@ services:
     networks:
       - intranet
 
-  kratos-selfservice-ui-rust:
-    image: kratos-selfservice-rust:latest
-    init: true
+  kratos-admin-ui:
+    image: dhiagharsallaoui/kratos-admin-ui:latest
+    ports:
+      - '3000:3000'
+    environment:
+      - KRATOS_PUBLIC_URL=http://kratos:4433
+      - KRATOS_ADMIN_URL=http://kratos:4434
+    depends_on:
+      - kratos
     networks:
       - intranet
-    ports:
-      - "4455:4455"
-    restart: unless-stopped
 
   mailslurper:
     image: oryd/mailslurper:latest-smtps

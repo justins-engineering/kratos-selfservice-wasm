@@ -1,3 +1,0 @@
-[submodule "kratos-client-rust"]
-	path = modules/kratos-client-rust
-	url = https://github.com/justins-engineering/kratos-client-rust.git
