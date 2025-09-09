@@ -2,7 +2,7 @@ use std::format;
 
 use crate::components::DisplayError;
 use crate::{Configuration, Create};
-use dioxus::logger::tracing::{debug, error};
+use dioxus::logger::tracing::error;
 use dioxus::prelude::*;
 use ory_kratos_client_wasm::apis::frontend_api::to_session;
 

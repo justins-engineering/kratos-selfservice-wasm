@@ -16,8 +16,6 @@ use crate::views::{
 #[cfg(feature = "web")]
 use gloo_timers::callback::Timeout;
 
-use ory_kratos_client_wasm::apis::metadata_api::{is_alive, is_ready};
-
 const KRATOS_BROWSER_URL: &str = "http://127.0.0.1:4433";
 const SESSION_COOKIE_NAME: &str = "session_expiry";
 
@@ -87,20 +85,6 @@ const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 fn main() {
   dioxus::logger::initialize_default();
   dioxus::launch(App);
-}
-
-fn kratos_check() {
-  spawn(async move {
-    match is_alive(&Configuration::create()).await {
-      Ok(r) => debug!("Kratos liveliness check: {}", r.status),
-      Err(e) => error!("Kratos liveliness check failed! Error: {:?}", e.to_string()),
-    };
-
-    match is_ready(&Configuration::create()).await {
-      Ok(r) => debug!("Kratos readiness check: {}", r.status),
-      Err(e) => error!("Kratos readiness check failed! Error: {:?}", e.to_string()),
-    };
-  });
 }
 
 #[component]
