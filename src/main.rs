@@ -242,8 +242,8 @@ fn Navbar() -> Element {
 #[component]
 pub fn Cards() -> Element {
   rsx! {
-    div { class: "lg:flex lg:flex-row lg:justify-between",
-      div { class: "card bg-primary hover:bg-primary/90 text-primary-content lg:h-full my-4 lg:basis-1/6",
+    div { class: "xl:flex xl:flex-row xl:justify-between",
+      div { class: "card bg-primary hover:bg-primary/90 text-primary-content xl:h-full my-4 xl:basis-1/6",
         a { href: "https://www.ory.sh/docs/getting-started/integrate-auth/expressjs",
           div { class: "card-body",
             h2 { class: "card-title", "Getting Started" }
@@ -253,7 +253,7 @@ pub fn Cards() -> Element {
           }
         }
       }
-      div { class: "card bg-primary hover:bg-primary/90 text-primary-content lg:h-full my-4 lg:basis-1/6",
+      div { class: "card bg-primary hover:bg-primary/90 text-primary-content xl:h-full my-4 xl:basis-1/6",
         a { href: "https://www.ory.sh/docs/kratos/self-service",
           div { class: "card-body",
             h2 { class: "card-title", "User flows" }
@@ -263,7 +263,7 @@ pub fn Cards() -> Element {
           }
         }
       }
-      div { class: "card bg-primary hover:bg-primary/90 text-primary-content lg:h-full my-4 lg:basis-1/6",
+      div { class: "card bg-primary hover:bg-primary/90 text-primary-content xl:h-full my-4 xl:basis-1/6",
         a { href: "https://www.ory.sh/docs/kratos/manage-identities/identity-schema",
           div { class: "card-body",
             h2 { class: "card-title", "Identities 101" }
@@ -273,7 +273,7 @@ pub fn Cards() -> Element {
           }
         }
       }
-      div { class: "card bg-primary hover:bg-primary/90 text-primary-content lg:h-full my-4 lg:basis-1/6",
+      div { class: "card bg-primary hover:bg-primary/90 text-primary-content xl:h-full my-4 xl:basis-1/6",
         a { href: "https://www.ory.sh/docs/kratos/session-management/overview",
           div { class: "card-body",
             h2 { class: "card-title", "Sessions" }
@@ -281,7 +281,7 @@ pub fn Cards() -> Element {
           }
         }
       }
-      div { class: "card bg-primary hover:bg-primary/90 text-primary-content lg:h-full my-4 lg:basis-1/6",
+      div { class: "card bg-primary hover:bg-primary/90 text-primary-content xl:h-full my-4 xl:basis-1/6",
         a { href: "https://www.ory.sh/docs/kratos/bring-your-own-ui/configure-ory-to-use-your-ui",
           div { class: "card-body",
             h2 { class: "card-title", "Custom UI" }
