@@ -40,7 +40,7 @@ services:
       - intranet
 
   kratos-selfservice-ui-rust:
-    image: kratos-selfservice-rust:latest
+    image: jeseng/kratos-selfservice-wasm:latest
     init: true
     networks:
       - intranet
