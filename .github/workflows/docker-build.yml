@@ -32,6 +32,7 @@ jobs:
           --cache-to type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max .
 
       - name: Move cache
+        if: success() || failure()
         run: |
           rm -rf ${{ runner.temp }}/.buildx-cache
           mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
