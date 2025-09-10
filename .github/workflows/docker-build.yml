@@ -27,7 +27,7 @@ jobs:
 
       - name: Build
         run: |
-          buildx build -t kratos-selfservice-wasm:latest \
+          docker buildx build -t kratos-selfservice-wasm:latest \
           --cache-from type=local,src=${{ runner.temp }}/.buildx-cache \
           --cache-to type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max .
 
