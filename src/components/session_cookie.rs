@@ -89,10 +89,14 @@ pub fn SetSessionCookie(state: bool) -> Element {
             }
             Err(_) => {
               error!("Failed to set cookie");
+              navigator().replace(Route::Home {});
             }
           }
         }
-        Err(err) => error!("{err:?}"),
+        Err(err) => {
+          error!("{err:?}");
+          navigator().replace(Route::Home {});
+        }
       }
     };
   } else {
