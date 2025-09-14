@@ -86,7 +86,7 @@
 
     "chownr": ["chownr@3.0.0", "", {}, "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g=="],
 
-    "daisyui": ["daisyui@5.1.9", "", {}, "sha512-ucptlYpiVMiY33VCehYoO1jI3cVjo4TbTKTr+zNG7sV+FO9UFUKiT54mynoUjIwWi2FXxrm0vDPj+2PmXGkXgA=="],
+    "daisyui": ["daisyui@5.1.11", "", {}, "sha512-FulNCppwtnVUNduNYq3SwSk723sdI866Zw5miCfOq+3+e4y+5+HcPssOLHW3rS2P875bGkq+s8vpoO/ESPqpoQ=="],
 
     "detect-libc": ["detect-libc@1.0.3", "", { "bin": { "detect-libc": "./bin/detect-libc.js" } }, "sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg=="],
 

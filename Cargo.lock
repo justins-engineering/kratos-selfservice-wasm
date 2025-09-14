@@ -2442,7 +2442,7 @@ dependencies = [
 
 [[package]]
 name = "kratos-selfservice-rust"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "dioxus",

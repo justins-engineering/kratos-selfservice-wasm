@@ -1,6 +1,6 @@
 [package]
 name = "kratos-selfservice-rust"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["JES <justin@jes.contact>"]
 edition = "2024"
 
