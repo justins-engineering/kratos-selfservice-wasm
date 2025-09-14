@@ -90,9 +90,11 @@ fn main() {
 #[component]
 fn App() -> Element {
   use_context_provider(|| Session {
-    // state: Signal::new(session_cookie_valid()),
     state: Signal::new(false),
   });
+
+  let set_state = use_resource(move || async move { session_cookie_valid().await });
+  (set_state)();
 
   rsx! {
     document::Link { rel: "icon", href: FAVICON }
@@ -100,32 +102,6 @@ fn App() -> Element {
     Router::<Route> {}
   }
 }
-
-// #[component]
-// fn SetOrySession(state: bool) -> Element {
-//   use_effect(move || {
-//     let timeout = Timeout::new(5, move || {
-//       let _ = web_sys::window()
-//         .expect("Could not access window")
-//         .location()
-//         .replace("/");
-//     });
-//     timeout.forget();
-//   });
-
-//   rsx! {
-//     if state {
-//       {*use_context::<Session>().state.write() = set_session_cookie()}
-//       p { "Logging In" }
-//     } else {
-//       {
-//           remove_session_cookie();
-//           navigator().push(Route::Home {});
-//       }
-//       p { "Logging Out" }
-//     }
-//   }
-// }
 
 /// Home page
 #[component]
@@ -147,11 +123,28 @@ fn Home() -> Element {
 /// Shared navbar component.
 #[component]
 fn Navbar() -> Element {
-  // let session_valid = use_context::<Session>().state;
-  // let session = use_resource(move || async move { session_cookie_valid().await });
-  // let session_valid = session_cookie_valid();
+  debug!("{:?}", use_context::<Session>());
 
-  let mut links = use_signal(|| {
+  let links = if *use_context::<Session>().state.read() {
+    rsx! {
+      li { class: "menu-disabled",
+        Link { to: Route::SignIn {}, "Sign In" }
+      }
+      li { class: "menu-disabled",
+        Link { to: Route::SignUp {}, "Sign Up" }
+      }
+      li { class: "menu-disabled",
+        Link { to: Route::AccountRecovery {}, "Account Recovery" }
+      }
+      li {
+        Link { to: Route::Verify {}, "Account Verification" }
+      }
+      li {
+        Link { to: Route::Settings {}, "Account Settings" }
+      }
+      OryLogOut {}
+    }
+  } else {
     rsx! {
       li {
         Link { to: Route::SignIn {}, "Sign In" }
@@ -169,33 +162,10 @@ fn Navbar() -> Element {
         Link { to: Route::Settings {}, "Account Settings" }
       }
       li { class: "menu-disabled",
-        a { href: "{KRATOS_BROWSER_URL}/self-service/logout", "Log out" }
+        a { href: "", "Log out" }
       }
     }
-  });
-
-  use_effect(move || {
-    if session_cookie_valid() {
-      *links.write() = rsx! {
-        li { class: "menu-disabled",
-          Link { to: Route::SignIn {}, "Sign In" }
-        }
-        li { class: "menu-disabled",
-          Link { to: Route::SignUp {}, "Sign Up" }
-        }
-        li { class: "menu-disabled",
-          Link { to: Route::AccountRecovery {}, "Account Recovery" }
-        }
-        li {
-          Link { to: Route::Verify {}, "Account Verification" }
-        }
-        li {
-          Link { to: Route::Settings {}, "Account Settings" }
-        }
-        li { OryLogOut {} }
-      }
-    }
-  });
+  };
 
   rsx! {
     div { class: "drawer lg:drawer-open",
@@ -230,9 +200,8 @@ fn Navbar() -> Element {
           }
           li {
             h2 { class: "menu-title", "Default User Interfaces" }
-            ul { {links()} }
+            ul { {links} }
           }
-                // p { {format!("{:#?}", use_context::<Session>())} }
         }
       }
     }

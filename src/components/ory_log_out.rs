@@ -13,14 +13,24 @@ pub fn OryLogOut() -> Element {
     Some(new_flow) => match new_flow {
       Ok(res) => {
         rsx! {
-          a { href: res.logout_url.clone(), "Log out" }
+          li {
+            a { href: res.logout_url.to_owned(), "Log out" }
+          }
         }
       }
       Err(err) => {
         error!("{err:#?}");
-        rsx! {}
+        rsx! {
+          li { class: "menu-disabled",
+            a { href: "", "Log out" }
+          }
+        }
       }
     },
-    None => rsx! {},
+    None => rsx! {
+      li { class: "menu-disabled",
+        a { href: "", "Log out" }
+      }
+    },
   };
 }

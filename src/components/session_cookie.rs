@@ -4,20 +4,12 @@ use dioxus::logger::tracing::{debug, error};
 use dioxus::prelude::*;
 use ory_kratos_client_wasm::apis::frontend_api::to_session;
 
-#[cfg(feature = "web")]
-use gloo_timers::callback::Timeout;
+// #[cfg(feature = "web")]
+// use gloo_timers::callback::Timeout;
 
 macro_rules! window {
   () => {
     web_sys::window().expect("Could not access window")
-  };
-}
-
-macro_rules! document {
-  ($window:expr) => {
-    $window
-      .document()
-      .expect("Could not access window document")
   };
 }
 
@@ -41,7 +33,7 @@ macro_rules! get_cookies {
 }
 
 const COOKIE_STR_LEN: usize = SESSION_COOKIE_NAME.len()
-  // + u32::MAX.to_string().len()
+  // u32::MAX.to_string().len()
   + 10
   + "2025-08-05T17:14:07.837312011Z".len()
   + "=; path=/; SameSite=Strict; max-age=; Secure".len();
@@ -106,7 +98,6 @@ pub fn set_session_cookie() -> bool {
       Err(err) => error!("{err:?}"),
     }
   };
-  debug!("{:?}", html_document.cookie());
 
   false
 }
@@ -118,6 +109,8 @@ pub fn SetSessionCookie(state: bool) -> Element {
   let create_flow: Resource<Result<_, ory_kratos_client_wasm::apis::Error<_>>> = use_resource(
     move || async move { to_session(&Configuration::create(), None, None, None).await },
   );
+
+  use_effect(move || use_context::<Session>().state.set(state));
 
   if state {
     if let Some(Ok(session)) = &*create_flow.read()
@@ -155,33 +148,27 @@ pub fn SetSessionCookie(state: bool) -> Element {
     remove_session_cookie();
     navigator().replace(Route::Home {});
   }
-  debug!("{:?}", html_document.cookie());
-
   rsx!()
 }
 
-pub fn session_cookie_valid() -> bool {
+pub async fn session_cookie_valid() {
   let html_document = html_document!(window!());
   let cookie_string = get_cookies!(html_document);
-  debug!("{cookie_string:?}");
   let cookies = cookie_string.split(';');
-  debug!("{cookies:?}");
+  let mut valid = use_context::<crate::Session>().state;
 
   for cookie in cookies {
     if cookie.contains(SESSION_COOKIE_NAME) {
-      debug!("contains name");
       let mut c = cookie_string.split('=');
       if let Some(expiry) = c.next_back() {
-        debug!("{expiry:?}");
         let timestamp: Result<DateTime<FixedOffset>, chrono::ParseError> =
           DateTime::parse_from_rfc3339(expiry);
         match timestamp {
           Ok(dt) => {
-            debug!("{dt:?}");
             let now = Utc::now().with_timezone(dt.offset());
-            debug!("{now:?}");
             if now < dt {
-              return true;
+              valid.set(true);
+              return;
             }
           }
           Err(err) => error!("{err:?}"),
@@ -190,5 +177,5 @@ pub fn session_cookie_valid() -> bool {
     }
   }
 
-  false
+  valid.set(false);
 }
