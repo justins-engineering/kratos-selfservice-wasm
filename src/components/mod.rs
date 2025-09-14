@@ -9,6 +9,4 @@ pub use ory_log_out::OryLogOut;
 
 mod session_cookie;
 pub use session_cookie::SetSessionCookie;
-pub use session_cookie::remove_session_cookie;
 pub use session_cookie::session_cookie_valid;
-pub use session_cookie::set_session_cookie;
