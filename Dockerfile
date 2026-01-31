@@ -17,7 +17,7 @@ COPY --link ./src/components ./src/components/
 COPY --link ./src/views ./src/views/
 
 RUN set -ex \
-  && curl -fsSL https://bun.com/install | bash -s "bun-v1.2.21" \
+  && curl -fsSL https://bun.com/install | bash \
   && mv ~/.bun/bin/bun /usr/bin/
 
 RUN set -ex \
@@ -30,11 +30,11 @@ RUN set -ex \
   && cargo install --path .
 
 RUN set -ex \
-  && dx bundle --platform web \
+  && dx bundle --web --release \
   && echo "E404:index.html\n.wasm:application/wasm" > httpd.conf
 
 FROM lipanski/docker-static-website:latest
 COPY --from=build /usr/src/app/httpd.conf /etc/httpd.conf
-COPY --from=build /usr/src/app/dist/public/index.html .
-COPY --from=build /usr/src/app/dist/public/assets/* ./assets/
+COPY --from=build /usr/src/app/dist/public .
+
 CMD ["/busybox-httpd", "-f", "-v", "-p", "4455"]
