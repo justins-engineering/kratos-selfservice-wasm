@@ -10,28 +10,34 @@ RUN set -ex \
   && cargo binstall dioxus-cli
 
 COPY --link Cargo.lock Cargo.toml Dioxus.toml package.json bun.lock tailwind.css ./
-COPY --link ./assets/* ./assets/
-COPY --link ./.cargo/* ./.cargo/
-COPY --link ./src/main.rs ./src/
-COPY --link ./src/components ./src/components/
-COPY --link ./src/views ./src/views/
+COPY --link ./assets ./assets
+COPY --link ./.cargo ./.cargo
+COPY --link ./src ./src
 
+# Install bun
 RUN set -ex \
   && curl -fsSL https://bun.com/install | bash \
   && mv ~/.bun/bin/bun /usr/bin/
 
+# Install js deps and process tailwind.css
 RUN set -ex \
   && printenv \
   && bun install --production \
   && bun x @tailwindcss/cli -i ./tailwind.css -o ./assets/tailwind.css --minify
 
+# Add wasm32 rust target and caro install
 RUN set -ex \
   && rustup target add wasm32-unknown-unknown \
   && cargo install --path .
 
+# Dioxus bundle/build
+RUN set -ex && dx bundle --web --release
+
+# Add httpd rules
 RUN set -ex \
-  && dx bundle --web --release \
-  && echo "E404:index.html\n.wasm:application/wasm" > httpd.conf
+  && echo "E404:index.html" > httpd.conf \
+  && echo ".wasm:application/wasm" >> httpd.conf \
+  && echo "P:/favicon.ico:127.0.0.1:4455/assets/favicon.ico" >> httpd.conf
 
 FROM lipanski/docker-static-website:latest
 COPY --from=build /usr/src/app/httpd.conf /etc/httpd.conf

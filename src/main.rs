@@ -74,9 +74,6 @@ enum Route {
     PageNotFound { route: Vec<String> },
 }
 
-const FAVICON: Asset = asset!("/assets/favicon.ico");
-const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
-
 fn main() {
   dioxus::logger::initialize_default();
   dioxus::launch(App);
@@ -92,8 +89,14 @@ fn App() -> Element {
   (set_state)();
 
   rsx! {
-    document::Link { rel: "icon", href: FAVICON }
-    document::Link { rel: "stylesheet", href: TAILWIND_CSS }
+    document::Link {
+      rel: "icon",
+      href: asset!("/assets/favicon.ico", AssetOptions::builder().with_hash_suffix(false)),
+    }
+    document::Link {
+      rel: "stylesheet",
+      href: asset!("/assets/tailwind.css", AssetOptions::builder().with_hash_suffix(false)),
+    }
     Router::<Route> {}
   }
 }

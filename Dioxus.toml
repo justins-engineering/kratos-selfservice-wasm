@@ -7,9 +7,9 @@ out_dir = "dist"
 copyright = "Justin's Engineering Services, LLC"
 identifier = "com.justinsengineering"
 publisher = "Justin's Engineering Services, LLC"
+icon = ["assets/favicon.ico"]
 
 [web.app]
-
 # HTML title tag content
 title = "Kratos"
 
