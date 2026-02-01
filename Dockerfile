@@ -33,11 +33,14 @@ RUN set -ex \
 # Dioxus bundle/build
 RUN set -ex && dx bundle --web --release
 
+# Link favicon.ico to assets/favicon.ico
+RUN set -ex \
+  && ln /usr/src/app/dist/public/assets/favicon.ico /usr/src/app/dist/public/favicon.ico
+
 # Add httpd rules
 RUN set -ex \
   && echo "E404:index.html" > httpd.conf \
-  && echo ".wasm:application/wasm" >> httpd.conf \
-  && echo "P:/favicon.ico:127.0.0.1:4455/assets/favicon.ico" >> httpd.conf
+  && echo ".wasm:application/wasm" >> httpd.conf
 
 FROM lipanski/docker-static-website:latest
 COPY --from=build /usr/src/app/httpd.conf /etc/httpd.conf
