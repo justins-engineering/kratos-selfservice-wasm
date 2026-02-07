@@ -1,6 +1,6 @@
 use dioxus::logger::tracing::error;
 use dioxus::prelude::*;
-use ory_kratos_client_wasm::models::UiNodeAttributes::{A, Img, Input, Script, Text};
+use ory_kratos_client_wasm::models::UiNodeAttributes::{A, Div, Img, Input, Script, Text};
 
 #[component]
 fn InputFieldNode(
@@ -217,6 +217,22 @@ fn LinkNode(
 }
 
 #[component]
+fn DivNode(attrs: ory_kratos_client_wasm::models::UiNodeDivisionAttributes) -> Element {
+  rsx! {
+    div { id: attrs.id,
+      if let Some(class) = attrs.class {
+        "class: {class}"
+      }
+      if let Some(data) = attrs.data {
+        for (key , value) in data {
+          "data-{key}: {value}"
+        }
+      }
+    }
+  }
+}
+
+#[component]
 fn ScriptNode(attrs: ory_kratos_client_wasm::models::UiNodeScriptAttributes) -> Element {
   rsx! {
     script {
@@ -281,7 +297,7 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client_wasm::models::UiNode>) -> Element {
                             }
                           },
                           pattern: "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{{8,}}",
-                        // title: "Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+                          // title: "Must be more than 8 characters, including number, lowercase letter, uppercase letter"
                         }
                       }
                   }
@@ -371,6 +387,11 @@ fn NodeBuilder(nodes: Vec<ory_kratos_client_wasm::models::UiNode>) -> Element {
           A(link) => {
               rsx! {
                 LinkNode { meta: node.meta.label, attrs: *link }
+              }
+          }
+          Div(div) => {
+              rsx! {
+                DivNode { attrs: *div }
               }
           }
           Script(script) => {

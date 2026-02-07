@@ -9,7 +9,7 @@ use ory_kratos_client_wasm::apis::frontend_api::{
 #[component]
 pub fn SignUp() -> Element {
   let create_flow = use_resource(move || async move {
-    create_browser_registration_flow(&Configuration::create(), None, None, None, None).await
+    create_browser_registration_flow(&Configuration::create(), None, None, None, None, None).await
   });
 
   return match &*create_flow.read() {
